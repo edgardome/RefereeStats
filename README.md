@@ -1,24 +1,23 @@
 # Referee Stats Scraper
 
-Scraper de estadísticas de árbitros de fútbol (fuente: Transfermarkt), en .NET 8,
-empaquetado como:
+Football referee statistics scraper (source: Transfermarkt), .NET 8, packaged as:
 
-1. **Apify Actor** — contenedor Docker que lee input JSON y escribe al dataset de Apify.
-2. **API REST** (`RefereeStats.WebApi`) — mismos datos vía HTTP, pensado para RapidAPI Hub.
+1. **Apify Actor** — Docker container that reads JSON input and writes to Apify dataset.
+2. **REST API** (`RefereeStats.WebApi`) — same data via HTTP, intended for RapidAPI Hub.
 
-Ambos hosts reutilizan `RefereeStats.Core` (scraping, parsing, export, modelos).
+Both hosts reuse `RefereeStats.Core` (scraping, parsing, export, models).
 
-## Estructura
+## Structure
 
 ```
-src/RefereeStats.Core/         Librería compartida: scraping, parsing, export, modelos
-src/RefereeStats.ApifyActor/   Host 1 — consola ejecutada dentro del Actor de Apify
-src/RefereeStats.WebApi/       Host 2 — API REST para RapidAPI
-tests/RefereeStats.Core.Tests/ xUnit — parsing con fixtures HTML locales, tests de export
-.actor/                        Manifest, input schema y Dockerfile del Actor
+src/RefereeStats.Core/         Shared library: scraping, parsing, export, models
+src/RefereeStats.ApifyActor/   Host 1 — console app executed inside Apify Actor
+src/RefereeStats.WebApi/       Host 2 — REST API for RapidAPI
+tests/RefereeStats.Core.Tests/ xUnit — parsing with local HTML fixtures, export tests
+.actor/                        Actor manifest, input schema, and Dockerfile
 ```
 
-## Build local
+## Local Build
 
 ```bash
 dotnet restore RefereeStats.slnx
@@ -26,32 +25,32 @@ dotnet build RefereeStats.slnx
 dotnet test RefereeStats.slnx
 ```
 
-## Ejecutar la WebApi localmente
+## Run WebApi Locally
 
 ```bash
 dotnet run --project src/RefereeStats.WebApi
 ```
 
-Swagger UI en `https://localhost:<port>/swagger` (solo en entorno Development).
+Swagger UI at `https://localhost:<port>/swagger` (Development environment only).
 
 Endpoints:
 
-- `GET /api/referees/{refereeId}/profile?league={league}&season={season}` — Nivel 1
-- `GET /api/referees/{refereeId}/matches?since={date}` — Nivel 2
-- `GET /api/referees/{refereeId}/analytics` — Nivel 3
-- `GET /api/leagues/{league}/referees?season={season}` — listado de árbitros
+- `GET /api/referees/{refereeId}/profile?league={league}&season={season}` — Level 1
+- `GET /api/referees/{refereeId}/matches?since={date}` — Level 2
+- `GET /api/referees/{refereeId}/analytics` — Level 3
+- `GET /api/leagues/{league}/referees?season={season}` — referee list
 
-### Autenticación RapidAPI
+### RapidAPI Authentication
 
-RapidAPI inyecta la cabecera `X-RapidAPI-Proxy-Secret` en cada petición reenviada a tu
-backend. `RapidApiProxySecretMiddleware` valida esa cabecera contra `RapidApi:ProxySecret`
-(appsettings o variable de entorno `RapidApi__ProxySecret`). Si no se configura ningún
-secreto, la validación se omite (útil en local/desarrollo).
+RapidAPI injects the `X-RapidAPI-Proxy-Secret` header on every request forwarded to your
+backend. `RapidApiProxySecretMiddleware` validates it against `RapidApi:ProxySecret`
+(appsettings or env var `RapidApi__ProxySecret`). If no secret is configured, validation
+is skipped (useful for local/dev).
 
-Rate limiting propio vía `AspNetCoreRateLimit` (ver sección `IpRateLimiting` en
-`appsettings.json`) — independiente del rate limiting que gestione RapidAPI.
+Rate limiting via `AspNetCoreRateLimit` (see `IpRateLimiting` section in
+`appsettings.json`) — independent of RapidAPI's rate limiting.
 
-## Build de Docker (Apify Actor)
+## Docker Build (Apify Actor)
 
 ```bash
 docker build -f .actor/Dockerfile -t referee-stats-actor .
@@ -62,55 +61,54 @@ docker run --rm \
   referee-stats-actor
 ```
 
-## Despliegue a Apify
+## Deploy to Apify
 
 ```bash
 apify login
 apify push
 ```
 
-`apify push` usa `.actor/actor.json` (manifest) y `.actor/Dockerfile`. El input del Actor
-se define en `.actor/input_schema.json` y aparece como formulario en Apify Console.
+`apify push` uses `.actor/actor.json` (manifest) and `.actor/Dockerfile`. Actor input
+is defined in `.actor/input_schema.json` and appears as a form in Apify Console.
 
-### Integración con la Apify API (sin SDK oficial de .NET)
+### Apify API Integration (No Official .NET SDK)
 
-`RefereeStats.ApifyActor/ApifyClient.cs` es un wrapper fino sobre HTTP puro:
+`RefereeStats.ApifyActor/ApifyClient.cs` is a thin HTTP wrapper:
 
-- **Leer input**: `GET /v2/key-value-stores/{storeId}/records/INPUT?token={APIFY_TOKEN}`
-- **Escribir resultados**: `POST /v2/datasets/{datasetId}/items?token={APIFY_TOKEN}`
-- **Guardar metadata**: `PUT /v2/key-value-stores/{storeId}/records/{key}?token={APIFY_TOKEN}`
+- **Read input**: `GET /v2/key-value-stores/{storeId}/records/INPUT?token={APIFY_TOKEN}`
+- **Write results**: `POST /v2/datasets/{datasetId}/items?token={APIFY_TOKEN}`
+- **Save metadata**: `PUT /v2/key-value-stores/{storeId}/records/{key}?token={APIFY_TOKEN}`
 
-Variables de entorno inyectadas automáticamente en runtime por Apify:
+Environment variables auto-injected by Apify at runtime:
 `APIFY_TOKEN`, `APIFY_DEFAULT_KEY_VALUE_STORE_ID`, `APIFY_DEFAULT_DATASET_ID`.
 
 ## Exports (CSV / Parquet / JSONL)
 
-Tras cada run, `RefereeStats.Core.Export.ExportService` genera:
+After each run, `RefereeStats.Core.Export.ExportService` generates:
 
 - `/app/exports/referees-{timestamp}.csv`
 - `/app/exports/referees-{timestamp}.parquet`
 - `/app/exports/referees-{timestamp}.jsonl`
 
-Apify empaqueta automáticamente el contenido de `/app/exports` como artefactos
-descargables del run.
+Apify automatically packages `/app/exports` contents as downloadable run artifacts.
 
-### Distribución semanal (Kaggle / HuggingFace / GitHub Releases)
+### Weekly Distribution (Kaggle / HuggingFace / GitHub Releases)
 
-`.github/workflows/publish-datasets.yml` corre cada domingo y publica los últimos
-exports en 3 canales gratuitos (SEO / lead-gen hacia Apify Store y RapidAPI). Requiere
-estos secrets en el repo de GitHub:
+`.github/workflows/publish-datasets.yml` runs every Sunday and publishes latest exports
+to 3 free channels (SEO / lead-gen toward Apify Store and RapidAPI). Requires these
+secrets in your GitHub repo:
 
-| Secret | Uso |
+| Secret | Purpose |
 |---|---|
-| `APIFY_TOKEN` | Leer metadata de exports desde Apify key-value store |
-| `APIFY_KV_STORE_ID` | Store donde se guardó `latest_exports` |
-| `KAGGLE_USERNAME`, `KAGGLE_KEY` | Publicar dataset en Kaggle |
-| `KAGGLE_DATASET_ID` | `usuario/nombre-dataset` en Kaggle |
-| `HUGGINGFACE_TOKEN` | Publicar dataset en HuggingFace |
-| `HF_DATASET_REPO` | `usuario/nombre-dataset` en HuggingFace |
-| `GITHUB_TOKEN` | Provisto automáticamente por Actions — crea el Release |
+| `APIFY_TOKEN` | Read export metadata from Apify key-value store |
+| `APIFY_KV_STORE_ID` | Store where `latest_exports` was saved |
+| `KAGGLE_USERNAME`, `KAGGLE_KEY` | Publish dataset to Kaggle |
+| `KAGGLE_DATASET_ID` | `username/dataset-name` on Kaggle |
+| `HUGGINGFACE_TOKEN` | Publish dataset to HuggingFace |
+| `HF_DATASET_REPO` | `username/dataset-name` on HuggingFace |
+| `GITHUB_TOKEN` | Auto-provided by Actions — creates Release |
 
-## Desplegar la WebApi (Azure App Service)
+## Deploy WebApi (Azure App Service)
 
 ```bash
 az webapp up \
@@ -120,26 +118,26 @@ az webapp up \
   --sku B1
 ```
 
-Configura `RapidApi__ProxySecret` como App Setting en Azure con el secreto que
-RapidAPI usa para tu API en su panel de configuración de backend.
+Set `RapidApi__ProxySecret` as App Setting in Azure with the secret RapidAPI uses
+for your API in its backend configuration panel.
 
-## Categorización de errores
+## Error Categorization
 
 `RefereeStats.Core.Scraping.ErrorCategory`: `Blocked`, `RateLimited`, `NetworkError`,
-`ParseError`, `SilentFailure`. El último cubre respuestas HTTP 200 que en realidad son
-páginas de verificación/CAPTCHA — detectado comprobando ausencia de selectores clave
-esperados en el HTML (ver `TransfermarktClient.DetectSilentFailure`).
+`ParseError`, `SilentFailure`. The last covers HTTP 200 responses that are actually
+verification/CAPTCHA pages — detected by checking for missing expected selectors in
+HTML (see `TransfermarktClient.DetectSilentFailure`).
 
-## Scraping incremental
+## Incremental Scraping
 
-`GetRefereeProfilesAsync(league, season, since)` acepta un parámetro `since` opcional
-para limitar el trabajo a partidos nuevos en el modo `matches` (Nivel 2), evitando
-recalcular todo el histórico en cada ejecución.
+`GetRefereeProfilesAsync(league, season, since)` accepts optional `since` parameter
+to limit work to new matches in `matches` mode (Level 2), avoiding recalculating
+entire history on each run.
 
-## Ligas soportadas (v0.1)
+## Supported Leagues (v0.1)
 
-- LaLiga 2 (España)
-- Premier League (Inglaterra)
+- LaLiga 2 (Spain)
+- Premier League (England)
 - Primera División (Argentina)
 
-No añadir más ligas hasta validar estas tres en producción.
+Do not add more leagues until validating these three in production.

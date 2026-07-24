@@ -6,7 +6,7 @@
     "league": {
       "title": "League",
       "type": "string",
-      "description": "Liga a scrapear.",
+      "description": "League to scrape.",
       "editor": "select",
       "enum": ["laliga2", "premier-league", "primera-division-argentina"],
       "enumTitles": ["LaLiga 2 (Spain)", "Premier League (England)", "Primera División (Argentina)"],
@@ -15,14 +15,14 @@
     "season": {
       "title": "Season",
       "type": "string",
-      "description": "Temporada, formato AAAA-AAAA.",
+      "description": "Season, format YYYY-YYYY.",
       "editor": "textfield",
       "default": "2025-2026"
     },
     "mode": {
       "title": "Mode",
       "type": "string",
-      "description": "Nivel de datos a extraer.",
+      "description": "Data level to extract.",
       "editor": "select",
       "enum": ["profile", "matches", "analytics"],
       "enumTitles": ["Profile (season aggregate)", "Matches (per-match)", "Analytics (derived)"],
@@ -31,7 +31,7 @@
     "since": {
       "title": "Since",
       "type": "string",
-      "description": "Fecha opcional (AAAA-MM-DD) para scraping incremental — solo partidos nuevos.",
+      "description": "Optional date (YYYY-MM-DD) for incremental scraping — new matches only.",
       "editor": "datepicker"
     }
   },
