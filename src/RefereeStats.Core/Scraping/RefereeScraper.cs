@@ -19,6 +19,8 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
     {
         ["laliga"] = "ES1",
         ["laliga2"] = "ES2",
+        ["premier"] = "GB1",
+        ["championship"] = "GB2",
     };
 
     /// <summary>Nivel 1: lista de árbitros y su agregado por temporada para una liga.</summary>
