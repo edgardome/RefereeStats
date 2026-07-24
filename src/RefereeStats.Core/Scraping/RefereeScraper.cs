@@ -189,9 +189,13 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
             Season = season,
             MatchesOfficiated = ParseInt(cells[2]),
             YellowCards = ParseInt(cells[3]),
-            SecondYellowCards = ParseInt(cells[4]),
-            DirectRedCards = ParseInt(cells[5]),
-            PenaltiesAwarded = ParseInt(cells[6]),
+            AverageYellowCards = ParseDecimal(cells.ElementAtOrDefault(4)),
+            SecondYellowCards = ParseInt(cells[5]),
+            AverageSecondYellowCards = ParseDecimal(cells.ElementAtOrDefault(6)),
+            DirectRedCards = ParseInt(cells[7]),
+            AverageDirectRedCards = ParseDecimal(cells.ElementAtOrDefault(8)),
+            PenaltiesAwarded = ParseInt(cells[9]),
+            AveragePenaltiesAwarded = ParseDecimal(cells.ElementAtOrDefault(10)),
         };
     }
 
@@ -242,22 +246,42 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
             return null;
         }
 
-        // Filas de árbitros incluyen: [0] fecha, [1] apariciones, [2] amarillas,
-        // [3] amarillo-rojas, [4] rojas, [5] penaltis (índices de td.zentriert en orden).
-        var cells = row.QuerySelectorAll("td.zentriert").Select(c => c.TextContent.Trim()).ToArray();
+        var flagImg = row.QuerySelector("img.flaggenrahmen");
+        var nationality = flagImg?.GetAttribute("alt")?.Trim();
 
-        // La primera columna es siempre la fecha; stats empiezan en [1].
+        var allCells = row.QuerySelectorAll("td").ToArray();
+        var centeredCells = row.QuerySelectorAll("td.zentriert").Select(c => c.TextContent.Trim()).ToArray();
+        var rightCell = row.QuerySelector("td.rechts")?.TextContent.Trim();
+
+        // Estructura: [0]=nombre, [1]=debut(zentriert), [2]=edad(rechts), [3]=apariciones(zentriert), [4-11]=stats
+        var debutText = centeredCells.ElementAtOrDefault(0) ?? string.Empty;
+        var appearances = ParseInt(centeredCells.ElementAtOrDefault(1));
+        var yellowCards = ParseInt(centeredCells.ElementAtOrDefault(2));
+        var avgYellow = ParseDecimal(centeredCells.ElementAtOrDefault(3));
+        var secondYellow = ParseInt(centeredCells.ElementAtOrDefault(4));
+        var avgSecondYellow = ParseDecimal(centeredCells.ElementAtOrDefault(5));
+        var redCards = ParseInt(centeredCells.ElementAtOrDefault(6));
+        var avgRed = ParseDecimal(centeredCells.ElementAtOrDefault(7));
+        var penalties = ParseInt(centeredCells.ElementAtOrDefault(8));
+        var avgPenalties = ParseDecimal(centeredCells.ElementAtOrDefault(9));
+
         return new RefereeProfile
         {
             RefereeId = refereeId,
             Name = name,
+            Nationality = string.IsNullOrWhiteSpace(nationality) ? null : nationality,
             League = league,
             Season = season,
-            MatchesOfficiated = ParseInt(cells.ElementAtOrDefault(1)),
-            YellowCards = ParseInt(cells.ElementAtOrDefault(2)),
-            SecondYellowCards = ParseInt(cells.ElementAtOrDefault(3)),
-            DirectRedCards = ParseInt(cells.ElementAtOrDefault(4)),
-            PenaltiesAwarded = ParseInt(cells.ElementAtOrDefault(5)),
+            DebutDate = TryParseDateFromText(debutText, out var debut) ? debut : null,
+            MatchesOfficiated = appearances,
+            YellowCards = yellowCards,
+            AverageYellowCards = avgYellow,
+            SecondYellowCards = secondYellow,
+            AverageSecondYellowCards = avgSecondYellow,
+            DirectRedCards = redCards,
+            AverageDirectRedCards = avgRed,
+            PenaltiesAwarded = penalties,
+            AveragePenaltiesAwarded = avgPenalties,
         };
     }
 
@@ -270,6 +294,15 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
 
     private static int ParseInt(string? raw)
         => int.TryParse(raw?.Trim(), out var value) ? value : 0;
+
+    private static decimal ParseDecimal(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw) || raw == "-")
+        {
+            return 0m;
+        }
+        return decimal.TryParse(raw.Trim(), System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : 0m;
+    }
 
     private static string SeasonToId(string season)
     {
