@@ -1,0 +1,39 @@
+{
+  "title": "Referee Stats Scraper Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "league": {
+      "title": "League",
+      "type": "string",
+      "description": "Liga a scrapear.",
+      "editor": "select",
+      "enum": ["laliga2", "premier-league", "primera-division-argentina"],
+      "enumTitles": ["LaLiga 2 (Spain)", "Premier League (England)", "Primera División (Argentina)"],
+      "default": "laliga2"
+    },
+    "season": {
+      "title": "Season",
+      "type": "string",
+      "description": "Temporada, formato AAAA-AAAA.",
+      "editor": "textfield",
+      "default": "2025-2026"
+    },
+    "mode": {
+      "title": "Mode",
+      "type": "string",
+      "description": "Nivel de datos a extraer.",
+      "editor": "select",
+      "enum": ["profile", "matches", "analytics"],
+      "enumTitles": ["Profile (season aggregate)", "Matches (per-match)", "Analytics (derived)"],
+      "default": "profile"
+    },
+    "since": {
+      "title": "Since",
+      "type": "string",
+      "description": "Fecha opcional (AAAA-MM-DD) para scraping incremental — solo partidos nuevos.",
+      "editor": "datepicker"
+    }
+  },
+  "required": ["league", "season", "mode"]
+}

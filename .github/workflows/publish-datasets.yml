@@ -1,0 +1,53 @@
+name: Publish Datasets
+
+on:
+  schedule:
+    - cron: '0 3 * * 0' # Cada domingo a las 3am UTC
+  workflow_dispatch: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download latest exports metadata from Apify
+        run: |
+          mkdir -p exports
+          curl -sf -H "Authorization: Bearer ${{ secrets.APIFY_TOKEN }}" \
+            "https://api.apify.com/v2/key-value-stores/${{ secrets.APIFY_KV_STORE_ID }}/records/latest_exports" \
+            -o exports/latest_exports.json
+
+      - name: Set up Python (Kaggle/HuggingFace CLIs)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Kaggle and HuggingFace CLIs
+        run: pip install kaggle huggingface_hub
+
+      - name: Publish to Kaggle
+        run: |
+          kaggle datasets version \
+            --dataset-id="${{ secrets.KAGGLE_DATASET_ID }}" \
+            --path=./exports \
+            --dir-mode=zip \
+            --message "Automatic weekly update"
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+
+      - name: Publish to HuggingFace
+        run: |
+          huggingface-cli upload "${{ secrets.HF_DATASET_REPO }}" ./exports . --repo-type dataset
+        env:
+          HF_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+
+      - name: Create GitHub Release
+        run: |
+          gh release create "data-$(date +%Y-%m-%d)" \
+            ./exports/*.parquet \
+            --title "Referee Stats - $(date +%Y-%m-%d)" \
+            --notes "Automatic weekly snapshot from Apify run."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

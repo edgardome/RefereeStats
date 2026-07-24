@@ -1,0 +1,9 @@
+{
+  "actorSpecification": 1,
+  "name": "referee-stats-scraper",
+  "title": "Referee Stats Scraper",
+  "description": "Scrapes football referee statistics (cards, penalties, matches) from Transfermarkt, per league/season, with incremental updates.",
+  "version": "0.1",
+  "dockerfile": "./Dockerfile",
+  "input": "./input_schema.json"
+}

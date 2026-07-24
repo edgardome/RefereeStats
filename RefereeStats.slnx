@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RefereeStats.ApifyActor/RefereeStats.ApifyActor.csproj" />
+    <Project Path="src/RefereeStats.Core/RefereeStats.Core.csproj" />
+    <Project Path="src/RefereeStats.WebApi/RefereeStats.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RefereeStats.Core.Tests/RefereeStats.Core.Tests.csproj" />
+  </Folder>
+</Solution>
