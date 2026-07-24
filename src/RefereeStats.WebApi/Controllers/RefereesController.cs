@@ -20,25 +20,44 @@ public sealed class RefereesController(RefereeScraper scraper) : ControllerBase
         return profile is null ? NotFound() : Ok(profile);
     }
 
-    /// <summary>Nivel 2: partidos arbitrados, opcionalmente filtrados desde una fecha (incremental).</summary>
-    [HttpGet("referees/{refereeId}/matches")]
-    [ProducesResponseType<IReadOnlyList<MatchCardEvent>>(StatusCodes.Status200OK)]
-    public Task<ActionResult<IReadOnlyList<MatchCardEvent>>> GetMatches(
-        string refereeId, [FromQuery] DateOnly? since, CancellationToken ct)
+    /// <summary>Nivel 1b: ficha biográfica del árbitro (nacionalidad, fecha de nacimiento).</summary>
+    [HttpGet("referees/{refereeId}/details")]
+    [ProducesResponseType<RefereeDetail>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<RefereeDetail>> GetDetails(string refereeId, CancellationToken ct)
     {
-        // Nivel 2 requiere scraping por partido, pendiente de implementar en RefereeScraper.
-        IReadOnlyList<MatchCardEvent> matches = [];
-        return Task.FromResult<ActionResult<IReadOnlyList<MatchCardEvent>>>(Ok(matches));
+        var detail = await scraper.GetRefereeDetailAsync(refereeId, ct);
+        return Ok(detail);
     }
 
-    /// <summary>Nivel 3: métricas derivadas/analíticas de un árbitro.</summary>
+    /// <summary>Nivel 1c: desglose por temporada de un árbitro dentro de una competición concreta.</summary>
+    [HttpGet("referees/{refereeId}/competitions/{league}/history")]
+    [ProducesResponseType<IReadOnlyList<RefereeProfile>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<RefereeProfile>>> GetCompetitionHistory(
+        string refereeId, string league, CancellationToken ct)
+    {
+        var history = await scraper.GetRefereeCompetitionHistoryAsync(refereeId, league, ct);
+        return Ok(history);
+    }
+
+    /// <summary>Level 2: Matches officiated, optionally filtered by date (incremental).</summary>
+    [HttpGet("referees/{refereeId}/matches")]
+    [ProducesResponseType<IReadOnlyList<MatchCardEvent>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<MatchCardEvent>>> GetMatches(
+        string refereeId, [FromQuery] string league, [FromQuery] string season, [FromQuery] DateOnly? since, CancellationToken ct)
+    {
+        var matches = await scraper.GetRefereeMatchesAsync(refereeId, league, season, since, ct);
+        return Ok(matches);
+    }
+
+    /// <summary>Level 3: Derived analytics (home/away bias, trends, team history).</summary>
     [HttpGet("referees/{refereeId}/analytics")]
     [ProducesResponseType<RefereeAnalytics>(StatusCodes.Status200OK)]
-    public Task<ActionResult<RefereeAnalytics>> GetAnalytics(string refereeId, CancellationToken ct)
+    public async Task<ActionResult<RefereeAnalytics>> GetAnalytics(
+        string refereeId, [FromQuery] string league, [FromQuery] string season, CancellationToken ct)
     {
-        // Nivel 3 se deriva de los datos de Nivel 2, pendiente de implementar.
-        var analytics = new RefereeAnalytics { RefereeId = refereeId };
-        return Task.FromResult<ActionResult<RefereeAnalytics>>(Ok(analytics));
+        var matches = await scraper.GetRefereeMatchesAsync(refereeId, league, season, ct: ct);
+        var analytics = RefereeAnalyticsService.ComputeAnalytics(refereeId, matches);
+        return Ok(analytics);
     }
 
     /// <summary>Listado de árbitros disponibles para una liga/temporada.</summary>

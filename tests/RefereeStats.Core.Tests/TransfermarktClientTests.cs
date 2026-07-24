@@ -10,7 +10,13 @@ public class TransfermarktClientTests
     {
         var handler = new FakeHttpMessageHandler(statusCode, content);
         var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://www.transfermarkt.com") };
-        return new TransfermarktClient(httpClient, Log.Logger);
+
+        // Permissive robots.txt with zero crawl-delay so tests run fast.
+        var robotsHandler = new FakeHttpMessageHandler(HttpStatusCode.OK, "User-agent: *\nCrawl-delay: 0\n");
+        var robotsHttpClient = new HttpClient(robotsHandler) { BaseAddress = new Uri("https://www.transfermarkt.com") };
+        var robotsTxt = new RobotsTxtChecker(robotsHttpClient, Log.Logger);
+
+        return new TransfermarktClient(httpClient, robotsTxt, Log.Logger);
     }
 
     private static async Task<string> ReadFixtureAsync(string fileName)

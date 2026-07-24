@@ -1,0 +1,9 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "transfermarkt",
+      "url": "https://www.transfermarkt.com/pierre-arbogast/profil/schiedsrichter/3520"
+    }
+  ]
+}
