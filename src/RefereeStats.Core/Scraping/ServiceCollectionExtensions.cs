@@ -62,6 +62,8 @@ public static class ServiceCollectionExtensions
     private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         => HttpPolicyExtensions
             .HandleTransientHttpError()
+            .Or<TimeoutException>()
+            .Or<System.Threading.Tasks.TaskCanceledException>(ex => !ex.CancellationToken.IsCancellationRequested)
             .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
             .WaitAndRetryAsync(3, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
 }

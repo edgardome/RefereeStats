@@ -142,13 +142,10 @@ public sealed class TransfermarktClient(HttpClient httpClient, RobotsTxtChecker 
         return document;
     }
 
-    /// <summary>
-    /// Enforces a minimum gap between consecutive requests (robots.txt Crawl-delay,
-    /// or 1s default) so we don't hammer the site — single-threaded politeness.
-    /// </summary>
     private async Task ApplyPolitenessDelayAsync(CancellationToken ct)
     {
-        var crawlDelay = await robotsTxt.GetCrawlDelayAsync(ct);
+        // Ignoramos el robots.txt temporalmente a petición del usuario para mayor velocidad
+        var crawlDelay = TimeSpan.FromMilliseconds(200);
 
         await _politenessLock.WaitAsync(ct);
         try

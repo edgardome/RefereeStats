@@ -3,6 +3,8 @@ using RefereeStats.Core.Scraping;
 using RefereeStats.WebApi;
 using Serilog;
 
+using RefereeStats.WebApi.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
@@ -24,6 +26,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddRefereeScraping();
+builder.Services.AddHostedService<MatchSyncBackgroundService>();
 
 // Rate limiting propio como red de seguridad adicional, independiente del de RapidAPI.
 builder.Services.AddMemoryCache();
@@ -39,10 +42,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseIpRateLimiting();
-app.UseMiddleware<RapidApiProxySecretMiddleware>();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
-app.UseHttpsRedirection();
+app.UseIpRateLimiting();
+
+app.UseWhen(
+    context => context.Request.Path.StartsWithSegments("/api"),
+    appBuilder => appBuilder.UseMiddleware<RapidApiProxySecretMiddleware>()
+);
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthorization();
 app.MapControllers();
 

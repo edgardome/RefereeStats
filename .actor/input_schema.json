@@ -4,23 +4,55 @@
   "schemaVersion": 1,
   "properties": {
     "league": {
-      "title": "League",
+      "title": "🏆 League",
       "type": "string",
       "description": "League to scrape.",
       "editor": "select",
-      "enum": ["laliga2", "premier-league", "primera-division-argentina"],
-      "enumTitles": ["LaLiga 2 (Spain)", "Premier League (England)", "Primera División (Argentina)"],
-      "default": "laliga2"
+      "enum": [
+        "laliga",
+        "laliga2",
+        "premier",
+        "championship",
+        "primera-division-argentina",
+        "bundesliga",
+        "primera-federacion-grupo-i",
+        "primera-federacion-grupo-ii",
+        "segunda-federacion-grupo-i",
+        "segunda-federacion-grupo-ii",
+        "segunda-federacion-grupo-iii",
+        "segunda-federacion-grupo-iv",
+        "segunda-federacion-grupo-v",
+        "copa-del-rey",
+        "copa-federacion"
+      ],
+      "enumTitles": [
+        "LaLiga (Spain)",
+        "LaLiga 2 (Spain)",
+        "Premier League (England)",
+        "Championship (England)",
+        "Primera División (Argentina)",
+        "Bundesliga (Germany)",
+        "1ª RFEF Grupo I",
+        "1ª RFEF Grupo II",
+        "2ª RFEF Grupo I",
+        "2ª RFEF Grupo II",
+        "2ª RFEF Grupo III",
+        "2ª RFEF Grupo IV",
+        "2ª RFEF Grupo V",
+        "Copa del Rey",
+        "Copa Federación"
+      ],
+      "default": "laliga"
     },
     "season": {
-      "title": "Season",
+      "title": "📅 Season",
       "type": "string",
       "description": "Season, format YYYY-YYYY.",
       "editor": "textfield",
       "default": "2025-2026"
     },
     "mode": {
-      "title": "Mode",
+      "title": "🔍 Data Level",
       "type": "string",
       "description": "Data level to extract.",
       "editor": "select",
@@ -29,7 +61,7 @@
       "default": "profile"
     },
     "since": {
-      "title": "Since",
+      "title": "⚙️ Since Date",
       "type": "string",
       "description": "Optional date (YYYY-MM-DD) for incremental scraping — new matches only.",
       "editor": "datepicker"

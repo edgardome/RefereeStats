@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RefereeStats Dashboard — Premium Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="glowglow glow-1"></div>
+    <div class="glowglow glow-2"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-brand">
+                <div class="logo-area">
+                    <span class="logo-badge">PRO</span>
+                    <h1>RefereeStats</h1>
+                </div>
+                <div class="subtitle">Statistical Analysis Platform</div>
+            </div>
+            
+            <div class="header-actions">
+                <!-- Theme Toggle -->
+                <div class="toggle-box" title="Toggle Light/Dark Theme">
+                    <span class="toggle-label">Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <!-- Selector Controls -->
+        <section class="controls-card glass-panel">
+            <div class="selector-group">
+                <div class="control-box">
+                    <label for="league-select">League</label>
+                    <select id="league-select">
+                        <option value="laliga">LaLiga (Spain)</option>
+                        <option value="laliga2" selected>LaLiga 2 (Spain)</option>
+                        <option value="premier">Premier League (England)</option>
+                        <option value="championship">Championship (England)</option>
+                        <option value="primera-federacion-grupo-i">Primera Federación - Grupo 1 (Spain)</option>
+                        <option value="primera-federacion-grupo-ii">Primera Federación - Grupo 2 (Spain)</option>
+                        <option value="segunda-federacion-grupo-i">Segunda Federación - Grupo 1 (Spain)</option>
+                        <option value="segunda-federacion-grupo-ii">Segunda Federación - Grupo 2 (Spain)</option>
+                        <option value="segunda-federacion-grupo-iii">Segunda Federación - Grupo 3 (Spain)</option>
+                        <option value="segunda-federacion-grupo-iv">Segunda Federación - Grupo 4 (Spain)</option>
+                        <option value="segunda-federacion-grupo-v">Segunda Federación - Grupo 5 (Spain)</option>
+                        <option value="copa-del-rey">Copa del Rey (Spain)</option>
+                        <option value="copa-federacion">Copa Federación (Spain)</option>
+                    </select>
+                </div>
+                <div class="control-box">
+                    <label for="season-select">Season</label>
+                    <select id="season-select">
+                        <option value="2020-2021">2020 - 2021</option>
+                        <option value="2021-2022">2021 - 2022</option>
+                        <option value="2022-2023">2022 - 2023</option>
+                        <option value="2023-2024">2023 - 2024</option>
+                        <option value="2024-2025" selected>2024 - 2025</option>
+                        <option value="2025-2026">2025 - 2026</option>
+                        <option value="2026-2027">2026 - 2027</option>
+                    </select>
+                </div>
+                <div class="control-box referee-box">
+                    <label for="referee-select">Referee</label>
+                    <select id="referee-select" disabled>
+                        <option value="">Select a league & season first...</option>
+                    </select>
+                </div>
+                <div class="control-box toggle-box">
+                    <label for="global-toggle" class="toggle-label" title="Cross-match statistics across all synced leagues for this referee">
+                        Global Stats Mode
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="global-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="actions-group">
+                <button id="leaderboard-button" class="btn-premium">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8M6 20V4M18 20v-4"/></svg>
+                    Leaderboard
+                </button>
+                <button id="sync-button" class="btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Sync League
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Dashboard Layout -->
+        <main class="dashboard-grid">
+            <!-- Left Side: Profile & Overall Stats -->
+            <div class="side-column">
+                <!-- Referee Info Card -->
+                <div class="referee-profile-card glass-panel loading-state" id="referee-card">
+                    <div class="profile-header">
+                        <div class="avatar-placeholder">Ref</div>
+                        <div class="profile-name-group">
+                            <h2 id="ref-name">No Referee Selected</h2>
+                            <p id="ref-nationality">Select a referee to load profile</p>
+                        </div>
+                        <button id="compare-btn" class="btn-secondary btn-small hidden" title="Compare against another referee">VS</button>
+                    </div>
+                    <div class="profile-details-list">
+                        <div class="detail-row">
+                            <span class="detail-label">Debut Date</span>
+                            <span class="detail-value" id="ref-debut">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Total Cache Matches</span>
+                            <span class="detail-value" id="ref-total-matches">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Derived Aggregates Card -->
+                <div class="aggregates-card glass-panel" id="stats-panel">
+                    <h3>Overall Averages</h3>
+                    <div class="aggregates-grid">
+                        <div class="agg-item">
+                            <span class="agg-label">Yellow Cards</span>
+                            <span class="agg-val text-yellow" id="avg-yellows">0.00</span>
+                        </div>
+                        <div class="agg-item">
+                            <span class="agg-label">2nd Yellows</span>
+                            <span class="agg-val text-orange" id="avg-double-yellows">0.00</span>
+                        </div>
+                        <div class="agg-item">
+                            <span class="agg-label">Direct Reds</span>
+                            <span class="agg-val text-red" id="avg-reds">0.00</span>
+                        </div>
+                        <div class="agg-item">
+                            <span class="agg-label">Penalties</span>
+                            <span class="agg-val text-indigo" id="avg-penalties">0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matchup Preview Card -->
+                <div class="matchup-card glass-panel hidden" id="matchup-panel" style="margin-top: 1.5rem;">
+                    <h3>Matchup Strictness Preview</h3>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; margin-bottom: 1rem;">
+                        <select id="home-team-input" class="matchup-input" style="flex: 1; width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--color-text-main);">
+                            <option value="">Home Team (Search...)</option>
+                        </select>
+                        <span style="align-self: center; font-weight: bold; color: var(--color-text-muted);">vs</span>
+                        <select id="away-team-input" class="matchup-input" style="flex: 1; width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--color-text-main);">
+                            <option value="">Away Team (Search...)</option>
+                        </select>
+                    </div>
+                    <button id="predict-btn" class="btn-secondary" style="width: 100%;">Predict Advantage</button>
+                    <div id="matchup-result" style="margin-top: 1rem; padding: 1rem; border-radius: 4px; background: var(--bg-base); display: none; text-align: center; font-weight: bold; border: 1px solid var(--border-color);"></div>
+                </div>
+            </div>
+
+            <!-- Right Side: Analytics & Details -->
+            <div class="main-column">
+                <!-- Home vs Away Bias Card -->
+                <div class="bias-card glass-panel" id="bias-panel">
+                    <div class="panel-header">
+                        <h3>Home vs Away Bias</h3>
+                        <span class="info-tag" id="bias-label">Neutral</span>
+                    </div>
+                    <p class="panel-desc">Calculated card and penalty distribution between Home and Away teams</p>
+                    
+                    <div class="bias-indicator-container">
+                        <div class="bias-scale">
+                            <div class="bias-marker" id="bias-marker" style="left: 50%;"></div>
+                        </div>
+                        <div class="bias-labels">
+                            <span>Strong Away Bias</span>
+                            <span>Balanced</span>
+                            <span>Strong Home Bias</span>
+                        </div>
+                    </div>
+
+                    <div class="bias-stats-grid">
+                        <div class="bias-stat-box">
+                            <span class="bias-stat-name">Home Cards %</span>
+                            <span class="bias-stat-value" id="home-cards-pct">0%</span>
+                        </div>
+                        <div class="bias-stat-box">
+                            <span class="bias-stat-name">Away Cards %</span>
+                            <span class="bias-stat-value" id="away-cards-pct">0%</span>
+                        </div>
+                        <div class="bias-stat-box">
+                            <span class="bias-stat-name">Home Pen %</span>
+                            <span class="bias-stat-value" id="home-pen-pct">0%</span>
+                        </div>
+                        <div class="bias-stat-box">
+                            <span class="bias-stat-name">Away Pen %</span>
+                            <span class="bias-stat-value" id="away-pen-pct">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referee vs Team Stats Card -->
+                <div class="team-stats-card glass-panel loading-state" id="team-stats-card" style="margin-top: 1.5rem;">
+                    <div class="panel-header">
+                        <h3>Referee vs Team Statistics</h3>
+                    </div>
+                    <p class="panel-desc">Select a team to see their specific record with this referee</p>
+                    
+                    <div class="control-box" style="margin-bottom: 1.5rem;">
+                        <select id="team-stats-select" disabled style="width: 100%; padding: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--color-text-main);">
+                            <option value="">Select a team...</option>
+                        </select>
+                    </div>
+
+                    <div id="team-stats-content" class="hidden">
+                        <div class="bias-stats-grid" style="margin-bottom: 1.5rem; text-align: center;">
+                            <div class="bias-stat-box" style="background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3);">
+                                <span class="bias-stat-name" style="color: #4ade80;">Wins</span>
+                                <span class="bias-stat-value" id="ts-wins">0</span>
+                            </div>
+                            <div class="bias-stat-box" style="background: rgba(156, 163, 175, 0.1); border-color: rgba(156, 163, 175, 0.3);">
+                                <span class="bias-stat-name" style="color: #9ca3af;">Draws</span>
+                                <span class="bias-stat-value" id="ts-draws">0</span>
+                            </div>
+                            <div class="bias-stat-box" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);">
+                                <span class="bias-stat-name" style="color: #f87171;">Losses</span>
+                                <span class="bias-stat-value" id="ts-losses">0</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-details-list">
+                            <div class="detail-row">
+                                <span class="detail-label">Matches Together</span>
+                                <span class="detail-value" id="ts-matches">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Goals (For : Against)</span>
+                                <span class="detail-value" id="ts-goals">- : -</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Yellow Cards Against</span>
+                                <span class="detail-value" id="ts-yellows" style="color: var(--color-yellow); font-weight: bold;">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Red Cards Against</span>
+                                <span class="detail-value" id="ts-reds" style="color: var(--color-red); font-weight: bold;">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Penalties (For : Against)</span>
+                                <span class="detail-value" id="ts-pens">- : -</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Match List Card -->
+                <div class="match-list-card glass-panel">
+                    <div class="table-header">
+                        <h3>Match History</h3>
+                        <span class="matches-count-badge" id="matches-count">0 Matches</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="matches-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Home Team</th>
+                                    <th>Score</th>
+                                    <th>Away Team</th>
+                                    <th>Cards Issued</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matches-tbody">
+                                <tr>
+                                    <td colspan="5" class="table-empty-state">Select a referee to view match history</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>League Leaderboard</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-controls">
+                <label>Sort By:</label>
+                <select id="leaderboard-sort">
+                    <option value="strictness">Strictness (Cards)</option>
+                    <option value="homeBias">Home Bias</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <table id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Referee</th>
+                            <th>Matches</th>
+                            <th>Avg YC</th>
+                            <th>Avg RC</th>
+                            <th>Home Bias</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compare Modal -->
+    <div id="compare-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Compare Referees</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-controls">
+                <label>Compare <span id="compare-ref-a-name" class="text-indigo"></span> with:</label>
+                <select id="compare-ref-select"></select>
+                <button id="run-compare-btn" class="btn-primary">Compare</button>
+            </div>
+            <div id="compare-results" class="compare-results hidden">
+                <div class="compare-grid">
+                    <div class="compare-col ref-a-col">
+                        <h4 id="res-name-a">-</h4>
+                        <p>Avg YC: <span id="res-yc-a"></span></p>
+                        <p>Home Bias: <span id="res-bias-a"></span>%</p>
+                    </div>
+                    <div class="compare-col ref-b-col">
+                        <h4 id="res-name-b">-</h4>
+                        <p>Avg YC: <span id="res-yc-b"></span></p>
+                        <p>Home Bias: <span id="res-bias-b"></span>%</p>
+                    </div>
+                </div>
+                <div class="compare-highlights">
+                    <h4>Insights</h4>
+                    <ul id="compare-insights"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -61,31 +61,114 @@ static async Task RunAsync(ServiceProvider provider)
     var scraper = provider.GetRequiredService<RefereeScraper>();
     var exporter = provider.GetRequiredService<ExportService>();
 
-    var since = input.Since is { Length: > 0 } s ? DateOnly.Parse(s) : (DateOnly?)null;
-    var profiles = await scraper.GetRefereeProfilesAsync(input.League, input.Season, since);
+    await apifyClient.ChargeEventAsync("actor-start");
 
-    await apifyClient.PushItemsAsync(datasetId, profiles);
-
-    var timestamp = Environment.GetEnvironmentVariable("RUN_TIMESTAMP_OVERRIDE")
-        ?? DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH-mm-ssZ");
-    const string exportDir = "/app/exports";
-    var csvPath = $"{exportDir}/referees-{timestamp}.csv";
-    var parquetPath = $"{exportDir}/referees-{timestamp}.parquet";
-    var jsonlPath = $"{exportDir}/referees-{timestamp}.jsonl";
-
-    await exporter.ExportToCsvAsync(profiles, csvPath);
-    await exporter.ExportToParquetAsync(profiles, parquetPath);
-    await exporter.ExportToJsonLAsync(profiles, jsonlPath);
-
-    await apifyClient.SaveMetadataAsync(inputStoreId, "latest_exports", new
+    if (input.Mode == "matches")
     {
-        csv = Path.GetFileName(csvPath),
-        parquet = Path.GetFileName(parquetPath),
-        jsonl = Path.GetFileName(jsonlPath),
-    });
+        var matchIds = await scraper.GetMatchdayCalendarAsync(input.League, input.Season);
+        Log.Information("Found {Count} matches in calendar. Starting granular download...", matchIds.Count);
+        
+        var reports = await scraper.GetGranularMatchReportsAsync(matchIds);
+        
+        // Reverse Indexing: group match reports by RefereeId
+        var reverseIndex = reports
+            .GroupBy(r => r.RefereeId)
+            .Select(g => new
+            {
+                RefereeId = g.Key,
+                Matches = g.ToList()
+            })
+            .ToList();
+            
+        await apifyClient.ChargeEventAsync("match-detail-item", reverseIndex.Count);
+        await apifyClient.PushItemsAsync(datasetId, reverseIndex);
+        
+        var timestamp = Environment.GetEnvironmentVariable("RUN_TIMESTAMP_OVERRIDE") ?? DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH-mm-ssZ");
+        const string exportDir = "/app/exports";
+        Directory.CreateDirectory(exportDir);
+        var jsonlPath = $"{exportDir}/referees-matches-{timestamp}.jsonl";
+        
+        var jsonLines = reverseIndex.Select(r => System.Text.Json.JsonSerializer.Serialize(r));
+        await File.WriteAllLinesAsync(jsonlPath, jsonLines);
+        
+        await apifyClient.SaveMetadataAsync(inputStoreId, "latest_exports", new
+        {
+            jsonl = Path.GetFileName(jsonlPath),
+        });
+        
+        Log.Information("Run complete: {Count} referees granular match data exported and pushed to dataset {DatasetId}", reverseIndex.Count, datasetId);
+    }
+    else if (input.Mode == "profile")
+    {
+        var since = input.Since is { Length: > 0 } s ? DateOnly.Parse(s) : (DateOnly?)null;
+        var profiles = await scraper.GetRefereeProfilesAsync(input.League, input.Season, since);
 
-    Log.Information("Run complete: {Count} referee profiles exported and pushed to dataset {DatasetId}",
-        profiles.Count, datasetId);
+        await apifyClient.ChargeEventAsync("profile-item", profiles.Count);
+        await apifyClient.PushItemsAsync(datasetId, profiles);
+
+        var timestamp = Environment.GetEnvironmentVariable("RUN_TIMESTAMP_OVERRIDE") ?? DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH-mm-ssZ");
+        const string exportDir = "/app/exports";
+        Directory.CreateDirectory(exportDir);
+        
+        var csvPath = $"{exportDir}/referees-{timestamp}.csv";
+        var parquetPath = $"{exportDir}/referees-{timestamp}.parquet";
+        var jsonlPath = $"{exportDir}/referees-{timestamp}.jsonl";
+
+        await exporter.ExportToCsvAsync(profiles, csvPath);
+        await exporter.ExportToParquetAsync(profiles, parquetPath);
+        await exporter.ExportToJsonLAsync(profiles, jsonlPath);
+
+        await apifyClient.SaveMetadataAsync(inputStoreId, "latest_exports", new
+        {
+            csv = Path.GetFileName(csvPath),
+            parquet = Path.GetFileName(parquetPath),
+            jsonl = Path.GetFileName(jsonlPath),
+        });
+
+        Log.Information("Run complete: {Count} referee profiles exported and pushed to dataset {DatasetId}", profiles.Count, datasetId);
+    }
+    else if (input.Mode == "analytics")
+    {
+        var matchIds = await scraper.GetMatchdayCalendarAsync(input.League, input.Season);
+        Log.Information("Analytics Mode: Found {Count} matches in calendar. Extracting data to compute analytics...", matchIds.Count);
+        
+        var reports = await scraper.GetGranularMatchReportsAsync(matchIds);
+        
+        var reverseIndex = reports
+            .GroupBy(r => r.RefereeId)
+            .ToList();
+
+        var analytics = new List<RefereeAnalytics>();
+        foreach (var group in reverseIndex)
+        {
+            var stats = RefereeAnalyticsService.ComputeAnalytics(group.Key, group.ToList());
+            analytics.Add(stats);
+        }
+
+        await apifyClient.ChargeEventAsync("analytics-item", analytics.Count);
+        await apifyClient.PushItemsAsync(datasetId, analytics);
+
+        var timestamp = Environment.GetEnvironmentVariable("RUN_TIMESTAMP_OVERRIDE") ?? DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH-mm-ssZ");
+        const string exportDir = "/app/exports";
+        Directory.CreateDirectory(exportDir);
+        
+        var csvPath = $"{exportDir}/referees-analytics-{timestamp}.csv";
+        var parquetPath = $"{exportDir}/referees-analytics-{timestamp}.parquet";
+        var jsonlPath = $"{exportDir}/referees-analytics-{timestamp}.jsonl";
+
+        await exporter.ExportToCsvAsync(analytics, csvPath);
+        await exporter.ExportToParquetAsync(analytics, parquetPath);
+        await exporter.ExportToJsonLAsync(analytics, jsonlPath);
+
+        await apifyClient.SaveMetadataAsync(inputStoreId, "latest_exports", new
+        {
+            csv = Path.GetFileName(csvPath),
+            parquet = Path.GetFileName(parquetPath),
+            jsonl = Path.GetFileName(jsonlPath),
+        });
+
+        Log.Information("Run complete: {Count} analytics records exported and pushed to dataset {DatasetId}", analytics.Count, datasetId);
+    }
 }
 
 internal sealed class ActorInput

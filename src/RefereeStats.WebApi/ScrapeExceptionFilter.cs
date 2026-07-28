@@ -9,11 +9,19 @@ public sealed class ScrapeExceptionFilter : IExceptionFilter
 {
     public void OnException(ExceptionContext context)
     {
-        if (context.Exception is ScrapeException ex)
+        if (context.Exception is ScrapeException scrapeEx)
         {
-            context.Result = new ObjectResult($"Scraping failed: {ex.Category}")
+            var problemDetails = new ProblemDetails
             {
-                StatusCode = StatusCodes.Status503ServiceUnavailable,
+                Title = "Scraping Error",
+                Status = StatusCodes.Status503ServiceUnavailable,
+                Detail = scrapeEx.Message
+            };
+            problemDetails.Extensions["errorCategory"] = scrapeEx.Category.ToString();
+
+            context.Result = new ObjectResult(problemDetails)
+            {
+                StatusCode = StatusCodes.Status503ServiceUnavailable
             };
             context.ExceptionHandled = true;
         }

@@ -40,6 +40,12 @@ Endpoints:
 - `GET /api/referees/{refereeId}/analytics` — Level 3
 - `GET /api/leagues/{league}/referees?season={season}` — referee list
 
+**Premium Value-Add Endpoints:**
+- `GET /api/analytics/leagues/{league}/leaderboard?season={season}&sortBy={strictness|homeBias}` — Ranks referees in a league by strictness or home bias.
+- `GET /api/analytics/matchup-preview?refereeId={id}&homeTeam={home}&awayTeam={away}&league={league}&season={season}` — Generates an insight on which team is historically favored by this referee.
+- `GET /api/analytics/compare?refereeAId={idA}&refereeBId={idB}&league={league}&season={season}` — Head-to-head referee comparison.
+- `GET /api/referees/{refereeId}/analytics` — (Updated) Now includes `refereeTeamHistory` with granular Wins, Draws, Losses, Goals, and Penalties for every team officiated.
+
 ### RapidAPI Authentication
 
 RapidAPI injects the `X-RapidAPI-Proxy-Secret` header on every request forwarded to your

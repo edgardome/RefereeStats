@@ -5,13 +5,21 @@ namespace RefereeStats.Core.Tests;
 
 public class RefereeAnalyticsServiceTests
 {
-    private static List<MatchCardEvent> SampleMatches() =>
+    private static List<GranularMatchReport> SampleMatches() =>
     [
-        new() { MatchId = "1", Date = new DateOnly(2025, 1, 1), HomeTeam = "Barcelona", AwayTeam = "Real Madrid", RefereeId = "123", HomeCards = 3, AwayCards = 1 },
-        new() { MatchId = "2", Date = new DateOnly(2025, 1, 8), HomeTeam = "Atletico", AwayTeam = "Valencia", RefereeId = "123", HomeCards = 2, AwayCards = 2 },
-        new() { MatchId = "3", Date = new DateOnly(2025, 1, 15), HomeTeam = "Barcelona", AwayTeam = "Sevilla", RefereeId = "123", HomeCards = 1, AwayCards = 4 },
-        new() { MatchId = "4", Date = new DateOnly(2025, 1, 22), HomeTeam = "Real Madrid", AwayTeam = "Barcelona", RefereeId = "123", HomeCards = 4, AwayCards = 2 },
+        new() { MatchId = "1", Date = new DateOnly(2025, 1, 1), HomeTeam = "Barcelona", AwayTeam = "Real Madrid", RefereeId = "123", Cards = CreateCards(3, 1) },
+        new() { MatchId = "2", Date = new DateOnly(2025, 1, 8), HomeTeam = "Atletico", AwayTeam = "Valencia", RefereeId = "123", Cards = CreateCards(2, 2) },
+        new() { MatchId = "3", Date = new DateOnly(2025, 1, 15), HomeTeam = "Barcelona", AwayTeam = "Sevilla", RefereeId = "123", Cards = CreateCards(1, 4) },
+        new() { MatchId = "4", Date = new DateOnly(2025, 1, 22), HomeTeam = "Real Madrid", AwayTeam = "Barcelona", RefereeId = "123", Cards = CreateCards(4, 2) },
     ];
+
+    private static List<CardEvent> CreateCards(int home, int away)
+    {
+        var list = new List<CardEvent>();
+        for (int i = 0; i < home; i++) list.Add(new CardEvent { IsHomeTeam = true, CardType = "Yellow" });
+        for (int i = 0; i < away; i++) list.Add(new CardEvent { IsHomeTeam = false, CardType = "Yellow" });
+        return list;
+    }
 
     [Fact]
     public void ComputeAnalytics_WithEmptyMatches_ReturnsZeroMetrics()
@@ -37,9 +45,9 @@ public class RefereeAnalyticsServiceTests
     [Fact]
     public void ComputeAnalytics_HomeAwayCardBiasRatio_ZeroAwayCards()
     {
-        var matches = new List<MatchCardEvent>
+        var matches = new List<GranularMatchReport>
         {
-            new() { MatchId = "1", Date = new DateOnly(2025, 1, 1), HomeTeam = "A", AwayTeam = "B", RefereeId = "123", HomeCards = 5, AwayCards = 0 },
+            new() { MatchId = "1", Date = new DateOnly(2025, 1, 1), HomeTeam = "A", AwayTeam = "B", RefereeId = "123", Cards = CreateCards(5, 0) },
         };
 
         var analytics = RefereeAnalyticsService.ComputeAnalytics("123", matches);
@@ -62,15 +70,14 @@ public class RefereeAnalyticsServiceTests
     {
         // Create 15 matches: first 5 with 1 card each (avg 1), last 10 with 2 cards each (avg 2)
         var matches = Enumerable.Range(0, 15)
-            .Select(i => new MatchCardEvent
+            .Select(i => new GranularMatchReport
             {
                 MatchId = $"{i}",
                 Date = new DateOnly(2025, 1, 1).AddDays(i),
                 HomeTeam = $"H{i}",
                 AwayTeam = $"A{i}",
                 RefereeId = "123",
-                HomeCards = i < 5 ? 1 : 2,
-                AwayCards = 0,
+                Cards = CreateCards(i < 5 ? 1 : 2, 0),
             })
             .ToList();
 

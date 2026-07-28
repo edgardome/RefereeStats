@@ -21,6 +21,17 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
         ["laliga2"] = "ES2",
         ["premier"] = "GB1",
         ["championship"] = "GB2",
+        ["primera-federacion-grupo-i"] = "E3G1",
+        ["primera-federacion-grupo-ii"] = "E3G2",
+        ["segunda-federacion-grupo-i"] = "E4G1",
+        ["segunda-federacion-grupo-ii"] = "E4G2",
+        ["segunda-federacion-grupo-iii"] = "E4G3",
+        ["segunda-federacion-grupo-iv"] = "E4G4",
+        ["segunda-federacion-grupo-v"] = "E4G5",
+        ["copa-del-rey"] = "CDR",
+        ["copa-federacion"] = "CEF1",
+        ["primera-division-argentina"] = "ARGC",
+        ["bundesliga"] = "L1",
     };
 
     /// <summary>Nivel 1: lista de árbitros y su agregado por temporada para una liga.</summary>
@@ -74,14 +85,40 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
         var competitionCode = ResolveCompetitionCode(league);
         var seasonId = SeasonToId(season);
         var documents = new List<IDocument>();
+        var seenRefereeIds = new HashSet<string>();
 
-        for (var page = 0; page < MaxLeaguePages; page++)
+        for (var page = 1; page <= MaxLeaguePages; page++)
         {
             var url = BuildLeagueUrl(league, competitionCode, seasonId, page);
             var document = await client.GetDocumentAsync(url, ct);
-            if (document.QuerySelectorAll("table.items > tbody > tr").Length == 0)
+            
+            var rows = document.QuerySelectorAll("table.items > tbody > tr");
+            if (rows.Length == 0)
             {
                 break;
+            }
+
+            var pageRefereeIds = new List<string>();
+            foreach (var row in rows)
+            {
+                var link = row.QuerySelector("td.hauptlink a");
+                var href = link?.GetAttribute("href") ?? string.Empty;
+                var id = ExtractIdFromHref(href);
+                if (!string.IsNullOrEmpty(id))
+                {
+                    pageRefereeIds.Add(id);
+                }
+            }
+
+            // If we have already seen all referee IDs on this page, we've wrapped around or hit a duplicate page.
+            if (page > 1 && pageRefereeIds.Count > 0 && pageRefereeIds.All(seenRefereeIds.Contains))
+            {
+                break;
+            }
+
+            foreach (var id in pageRefereeIds)
+            {
+                seenRefereeIds.Add(id);
             }
 
             documents.Add(document);
@@ -92,8 +129,10 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
 
     private static string BuildLeagueUrl(string league, string competitionCode, string seasonId, int page)
     {
-        var url = $"{BaseUrl}/{league}/schiedsrichter/wettbewerb/{competitionCode}/saison_id/{seasonId}";
-        return page == 0 ? url : $"{url}/plus/{page}";
+        var isCup = competitionCode == "CDR" || competitionCode == "CEF1";
+        var compType = isCup ? "pokalwettbewerb" : "wettbewerb";
+        var url = $"{BaseUrl}/{league}/schiedsrichter/{compType}/{competitionCode}/saison_id/{seasonId}/plus/1";
+        return page == 1 ? url : $"{url}/page/{page}";
     }
 
     private static string ResolveCompetitionCode(string league)
@@ -183,21 +222,54 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
             return null;
         }
 
+        int matchesOfficiated = 0, yellowCards = 0, secondYellowCards = 0, directRedCards = 0, penaltiesAwarded = 0;
+        decimal avgYellow = 0m, avgSecondYellow = 0m, avgRed = 0m, avgPenalties = 0m;
+
+        if (cells.Length >= 11)
+        {
+            matchesOfficiated = ParseInt(cells[2]);
+            yellowCards = ParseInt(cells[3]);
+            avgYellow = ParseDecimal(cells.ElementAtOrDefault(4));
+            secondYellowCards = ParseInt(cells[5]);
+            avgSecondYellow = ParseDecimal(cells.ElementAtOrDefault(6));
+            directRedCards = ParseInt(cells[7]);
+            avgRed = ParseDecimal(cells.ElementAtOrDefault(8));
+            penaltiesAwarded = ParseInt(cells[9]);
+            avgPenalties = ParseDecimal(cells.ElementAtOrDefault(10));
+        }
+        else
+        {
+            // Compact view
+            matchesOfficiated = ParseInt(cells[2]);
+            yellowCards = ParseInt(cells[3]);
+            secondYellowCards = ParseInt(cells[4]);
+            directRedCards = ParseInt(cells[5]);
+            penaltiesAwarded = ParseInt(cells[6]);
+
+            if (matchesOfficiated > 0)
+            {
+                avgYellow = Math.Round((decimal)yellowCards / matchesOfficiated, 2);
+                avgSecondYellow = Math.Round((decimal)secondYellowCards / matchesOfficiated, 2);
+                avgRed = Math.Round((decimal)directRedCards / matchesOfficiated, 2);
+                avgPenalties = Math.Round((decimal)penaltiesAwarded / matchesOfficiated, 2);
+            }
+        }
+
         return new RefereeProfile
         {
             RefereeId = refereeId,
             Name = name,
             League = league,
             Season = season,
-            MatchesOfficiated = ParseInt(cells[2]),
-            YellowCards = ParseInt(cells[3]),
-            AverageYellowCards = ParseDecimal(cells.ElementAtOrDefault(4)),
-            SecondYellowCards = ParseInt(cells[5]),
-            AverageSecondYellowCards = ParseDecimal(cells.ElementAtOrDefault(6)),
-            DirectRedCards = ParseInt(cells[7]),
-            AverageDirectRedCards = ParseDecimal(cells.ElementAtOrDefault(8)),
-            PenaltiesAwarded = ParseInt(cells[9]),
-            AveragePenaltiesAwarded = ParseDecimal(cells.ElementAtOrDefault(10)),
+            MatchesOfficiated = matchesOfficiated,
+            YellowCards = yellowCards,
+            AverageYellowCards = avgYellow,
+            SecondYellowCards = secondYellowCards,
+            AverageSecondYellowCards = avgSecondYellow,
+            DirectRedCards = directRedCards,
+            AverageDirectRedCards = avgRed,
+            PenaltiesAwarded = penaltiesAwarded,
+            AveragePenaltiesAwarded = avgPenalties,
         };
     }
 
@@ -255,17 +327,40 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
         var centeredCells = row.QuerySelectorAll("td.zentriert").Select(c => c.TextContent.Trim()).ToArray();
         var rightCell = row.QuerySelector("td.rechts")?.TextContent.Trim();
 
-        // Estructura: [0]=nombre, [1]=debut(zentriert), [2]=edad(rechts), [3]=apariciones(zentriert), [4-11]=stats
         var debutText = centeredCells.ElementAtOrDefault(0) ?? string.Empty;
         var appearances = ParseInt(centeredCells.ElementAtOrDefault(1));
-        var yellowCards = ParseInt(centeredCells.ElementAtOrDefault(2));
-        var avgYellow = ParseDecimal(centeredCells.ElementAtOrDefault(3));
-        var secondYellow = ParseInt(centeredCells.ElementAtOrDefault(4));
-        var avgSecondYellow = ParseDecimal(centeredCells.ElementAtOrDefault(5));
-        var redCards = ParseInt(centeredCells.ElementAtOrDefault(6));
-        var avgRed = ParseDecimal(centeredCells.ElementAtOrDefault(7));
-        var penalties = ParseInt(centeredCells.ElementAtOrDefault(8));
-        var avgPenalties = ParseDecimal(centeredCells.ElementAtOrDefault(9));
+
+        int yellowCards = 0, secondYellow = 0, redCards = 0, penalties = 0;
+        decimal avgYellow = 0m, avgSecondYellow = 0m, avgRed = 0m, avgPenalties = 0m;
+
+        if (centeredCells.Length >= 10)
+        {
+            // Detailed View
+            yellowCards = ParseInt(centeredCells.ElementAtOrDefault(2));
+            avgYellow = ParseDecimal(centeredCells.ElementAtOrDefault(3));
+            secondYellow = ParseInt(centeredCells.ElementAtOrDefault(4));
+            avgSecondYellow = ParseDecimal(centeredCells.ElementAtOrDefault(5));
+            redCards = ParseInt(centeredCells.ElementAtOrDefault(6));
+            avgRed = ParseDecimal(centeredCells.ElementAtOrDefault(7));
+            penalties = ParseInt(centeredCells.ElementAtOrDefault(8));
+            avgPenalties = ParseDecimal(centeredCells.ElementAtOrDefault(9));
+        }
+        else
+        {
+            // Compact View
+            yellowCards = ParseInt(centeredCells.ElementAtOrDefault(2));
+            secondYellow = ParseInt(centeredCells.ElementAtOrDefault(3));
+            redCards = ParseInt(centeredCells.ElementAtOrDefault(4));
+            penalties = ParseInt(centeredCells.ElementAtOrDefault(5));
+
+            if (appearances > 0)
+            {
+                avgYellow = Math.Round((decimal)yellowCards / appearances, 2);
+                avgSecondYellow = Math.Round((decimal)secondYellow / appearances, 2);
+                avgRed = Math.Round((decimal)redCards / appearances, 2);
+                avgPenalties = Math.Round((decimal)penalties / appearances, 2);
+            }
+        }
 
         return new RefereeProfile
         {
@@ -314,23 +409,66 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
     }
 
     /// <summary>
-    /// Nivel 2 (NO SOPORTADO): Transfermarkt no expone ningún listado de partidos arbitrados
-    /// por un árbitro concreto — investigado a fondo vía HAR (perfil, historial por
-    /// competición/temporada en sus variantes "Compact"/"Detailed view"): todas esas vistas son
-    /// agregados por temporada/competición (ver <see cref="GetRefereeCompetitionHistoryAsync"/>),
-    /// nunca partido a partido. La página de liga (<see cref="GetLeagueDocumentsAsync"/>) tampoco
-    /// sirve: lista árbitros, no partidos, así que el intento anterior de reutilizarla para esto
-    /// solo generaba una paginación cara (hasta <see cref="MaxLeaguePages"/> páginas) que siempre
-    /// devolvía vacío. Obtener partidos reales requeriría recorrer el calendario de la
-    /// competición jornada a jornada y abrir cada spielbericht para comprobar el árbitro — fuera
-    /// de alcance por ahora.
+    /// Scrape the entire matchday calendar for a league season to get all Match IDs.
+    /// Example URL: /laliga/gesamtspielplan/wettbewerb/ES1/saison_id/2024
     /// </summary>
-    public Task<IReadOnlyList<MatchCardEvent>> GetRefereeMatchesAsync(
-        string refereeId, string league, string season, DateOnly? since = null, CancellationToken ct = default)
+    public async Task<IReadOnlyList<string>> GetMatchdayCalendarAsync(string league, string season, CancellationToken ct = default)
     {
-        throw new NotSupportedException(
-            "Nivel 2 (partidos por árbitro) no soportado: Transfermarkt no expone un listado de partidos por árbitro, " +
-            "solo agregados por temporada/competición. Usa GetRefereeCompetitionHistoryAsync.");
+        var competitionCode = ResolveCompetitionCode(league);
+        var isCup = competitionCode == "CDR" || competitionCode == "CEF1";
+        var compType = isCup ? "pokalwettbewerb" : "wettbewerb";
+        var url = $"/{league}/gesamtspielplan/{compType}/{competitionCode}/saison_id/{SeasonToId(season)}";
+        var document = await client.GetDocumentAsync(url, ct);
+
+        var summaries = ParseMatchLinksFromDocument(document);
+        
+        // Filter out future/unplayed matches (which don't have a valid score like '1:2')
+        return summaries
+            .Where(s => s.FinalScore != null && System.Text.RegularExpressions.Regex.IsMatch(s.FinalScore.Trim(), @"^\d+:\d+$"))
+            .Select(s => s.MatchId)
+            .Distinct()
+            .ToList();
+    }
+
+    /// <summary>
+    /// Scrapes details for a single match report.
+    /// </summary>
+    public async Task<GranularMatchReport?> GetSingleGranularMatchReportAsync(string matchId, CancellationToken ct = default)
+    {
+        var url = $"/spielbericht/index/spielbericht/{matchId}";
+        var document = await client.GetDocumentAsync(url, ct);
+        return ParseGranularMatchReport(document, matchId);
+    }
+
+    /// <summary>
+    /// Orchestrates fetching granular match reports for a list of match IDs concurrently.
+    /// This respects the client's politeness delays.
+    /// </summary>
+    public async Task<IReadOnlyList<GranularMatchReport>> GetGranularMatchReportsAsync(IReadOnlyList<string> matchIds, CancellationToken ct = default)
+    {
+        var reports = new List<GranularMatchReport>();
+        
+        foreach (var matchId in matchIds)
+        {
+            if (ct.IsCancellationRequested) break;
+            
+            try
+            {
+                var report = await GetSingleGranularMatchReportAsync(matchId, ct);
+                
+                if (report != null)
+                {
+                    reports.Add(report);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Continue scraping other matches even if one fails
+                logger.Warning(ex, "Failed to scrape match report for ID {MatchId}", matchId);
+            }
+        }
+
+        return reports;
     }
 
     /// <summary>Extract match summaries (teams, score, match ID) from league season page.</summary>
@@ -351,17 +489,18 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
 
     private static MatchSummary? TryParseMatchRow(IElement row)
     {
-        // Home team: tr td:nth-child(1) > a
-        var homeTeamEl = row.QuerySelector("td:nth-child(1) > a");
+        // Home team: td with classes 'text-right' and 'hauptlink' containing an <a> tag
+        var homeTeamEl = row.QuerySelector("td.hauptlink.text-right a, td.text-right.hauptlink a");
         var homeTeam = homeTeamEl?.TextContent.Trim();
 
         // Score + match ID: a.ergebnis-link
         var scoreEl = row.QuerySelector("a.ergebnis-link");
         var score = scoreEl?.TextContent.Trim();
-        var matchIdStr = scoreEl?.GetAttribute("id");
+        var href = scoreEl?.GetAttribute("href");
+        var matchIdStr = href != null ? href.Split('/').LastOrDefault(s => !string.IsNullOrWhiteSpace(s)) : null;
 
-        // Away team: tr td:nth-child(5) > a
-        var awayTeamEl = row.QuerySelector("td:nth-child(5) > a");
+        // Away team: td with classes 'no-border-links' and 'hauptlink' containing an <a> tag
+        var awayTeamEl = row.QuerySelector("td.hauptlink.no-border-links a, td.no-border-links.hauptlink a");
         var awayTeam = awayTeamEl?.TextContent.Trim();
 
         if (string.IsNullOrWhiteSpace(homeTeam) || string.IsNullOrWhiteSpace(matchIdStr) || string.IsNullOrWhiteSpace(awayTeam))
@@ -378,31 +517,66 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
         };
     }
 
-    /// <summary>Extract cards and date from individual match detail page.</summary>
-    private static MatchCardEvent? ParseCardDataFromMatchDetail(IDocument document, MatchSummary summary, string refereeId)
+    /// <summary>Extract comprehensive match report including granular card events and referee info.</summary>
+    public static GranularMatchReport? ParseGranularMatchReport(IDocument document, string matchId)
     {
         var date = ExtractDateFromMatchDetail(document);
         if (date == default)
         {
-            return null;
+            // Return a fallback so we don't repeatedly scrape this unparseable match page
+            return new GranularMatchReport
+            {
+                MatchId = matchId,
+                RefereeId = "unknown",
+                Date = default,
+                HomeTeam = "Unknown",
+                AwayTeam = "Unknown",
+                FinalScore = null
+            };
         }
 
-        var homeCards = CountCardsInSection(document, "sb-leiste-heim");
-        var awayCards = CountCardsInSection(document, "sb-leiste-gast");
-        var firstCardMinute = ExtractFirstCardMinute(document);
+        var refereeId = ExtractRefereeIdFromMatchDetail(document);
+        
+        var homeTeamEl = document.QuerySelector("div.sb-heim a.sb-vereinslink");
+        var awayTeamEl = document.QuerySelector("div.sb-gast a.sb-vereinslink");
+        var homeTeamName = homeTeamEl?.TextContent.Trim() ?? "Unknown";
+        var awayTeamName = awayTeamEl?.TextContent.Trim() ?? "Unknown";
 
-        return new MatchCardEvent
+        var scoreEl = document.QuerySelector("div.sb-endstand");
+        var scoreText = scoreEl?.TextContent.Split('(').FirstOrDefault()?.Trim(); // "0:2(0:0)" -> "0:2"
+
+        if (string.IsNullOrWhiteSpace(refereeId))
         {
-            MatchId = summary.MatchId,
-            Date = date,
-            HomeTeam = summary.HomeTeam,
-            AwayTeam = summary.AwayTeam,
+            // Return fallback with "unknown" referee to prevent rescraping matches with no referee details
+            return new GranularMatchReport
+            {
+                MatchId = matchId,
+                RefereeId = "unknown",
+                Date = date,
+                HomeTeam = homeTeamName,
+                AwayTeam = awayTeamName,
+                FinalScore = scoreText
+            };
+        }
+
+        return new GranularMatchReport
+        {
+            MatchId = matchId,
             RefereeId = refereeId,
-            HomeCards = homeCards,
-            AwayCards = awayCards,
-            FirstCardMinute = firstCardMinute,
-            FinalScore = summary.FinalScore,
+            Date = date,
+            HomeTeam = homeTeamName,
+            AwayTeam = awayTeamName,
+            FinalScore = scoreText,
+            Cards = ExtractGranularCards(document),
+            Penalties = ExtractGranularPenalties(document)
         };
+    }
+
+    private static string? ExtractRefereeIdFromMatchDetail(IDocument document)
+    {
+        var refereeLink = document.QuerySelector("a[href*='/schiedsrichter/']");
+        var href = refereeLink?.GetAttribute("href") ?? string.Empty;
+        return ExtractIdFromHref(href);
     }
 
     private static DateOnly ExtractDateFromMatchDetail(IDocument document)
@@ -450,44 +624,112 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
         }
     }
 
-    // Iconos reales del timeline del partido (div.sb-leiste-{heim,gast} > div.sb-leiste-ereignis
-    // > span.sb-sprite.sb-*). "icons_sprite icon-*-formation" es del diagrama de alineación
-    // (pitch view), no del timeline, y no distingue equipo de forma fiable.
-    private static readonly string[] CardSpriteClasses = ["sb-gelb", "sb-gelbrot", "sb-rot"];
-
-    private static int CountCardsInSection(IDocument document, string sectionClass)
+    private static List<CardEvent> ExtractGranularCards(IDocument document)
     {
-        var section = document.QuerySelector($"div.{sectionClass}");
-        if (section is null) return 0;
-
-        return section.QuerySelectorAll("div.sb-leiste-ereignis").Count(IsCardEvent);
-    }
-
-    private static int? ExtractFirstCardMinute(IDocument document)
-    {
-        double? earliestPercent = null;
-
-        foreach (var eventDiv in document.QuerySelectorAll("div.sb-leiste-heim div.sb-leiste-ereignis, div.sb-leiste-gast div.sb-leiste-ereignis"))
+        var cards = new List<CardEvent>();
+        var items = document.QuerySelectorAll("#sb-karten ul li");
+        
+        foreach (var item in items)
         {
-            if (!IsCardEvent(eventDiv))
+            var isHome = item.ClassList.Contains("sb-aktion-heim");
+            var uhrElement = item.QuerySelector("div.sb-aktion-uhr span.sb-sprite-uhr-klein");
+            if (uhrElement == null) continue;
+            
+            var minute = ParseMinuteFromSprite(uhrElement);
+            
+            var spriteEl = item.QuerySelector("div.sb-aktion-spielstand span.sb-sprite");
+            var cardType = "Unknown";
+            if (spriteEl != null)
             {
-                continue;
+                if (spriteEl.ClassList.Contains("sb-gelb")) cardType = "Yellow";
+                else if (spriteEl.ClassList.Contains("sb-gelbrot")) cardType = "SecondYellow";
+                else if (spriteEl.ClassList.Contains("sb-rot")) cardType = "Red";
             }
-
-            var leftMatch = System.Text.RegularExpressions.Regex.Match(eventDiv.GetAttribute("style") ?? string.Empty, @"left:\s*([\d.]+)%");
-            if (leftMatch.Success && double.TryParse(leftMatch.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture, out var percent))
+            
+            if (cardType == "Unknown") continue; // Not a card event
+            
+            var aktionText = item.QuerySelector("div.sb-aktion-aktion")?.TextContent ?? "";
+            var parts = aktionText.Split(new[] { ',' }, 2);
+            var reason = parts.Length > 1 ? parts[1].Trim() : null;
+            
+            cards.Add(new CardEvent
             {
-                earliestPercent = earliestPercent is null ? percent : Math.Min(earliestPercent.Value, percent);
-            }
+                Minute = minute,
+                IsHomeTeam = isHome,
+                CardType = cardType,
+                Reason = reason
+            });
         }
-
-        return earliestPercent is null ? null : (int)(earliestPercent.Value * 0.9);
+        
+        return cards;
     }
 
-    // El estilo "left: X%" vive en el <div class="sb-leiste-ereignis">, no en el <span> interior.
-    private static bool IsCardEvent(IElement eventDiv)
-        => eventDiv.QuerySelector("span.sb-sprite") is { } sprite
-            && CardSpriteClasses.Any(sprite.ClassList.Contains);
+    private static List<PenaltyEvent> ExtractGranularPenalties(IDocument document)
+    {
+        var penalties = new List<PenaltyEvent>();
+        
+        var items = document.QuerySelectorAll("ul li");
+        foreach (var item in items)
+        {
+            var isHome = item.ClassList.Contains("sb-aktion-heim");
+            var isAway = item.ClassList.Contains("sb-aktion-gast");
+            if (!isHome && !isAway) continue;
+            
+            var spriteEl = item.QuerySelector("span.sb-sprite.sb-elfmetertor, span.sb-sprite.sb-elfmeter-verschossen");
+            var aktionText = item.QuerySelector("div.sb-aktion-aktion")?.TextContent ?? "";
+            
+            string? type = null;
+            if (spriteEl != null)
+            {
+                if (spriteEl.ClassList.Contains("sb-elfmetertor")) type = "Scored";
+                else if (spriteEl.ClassList.Contains("sb-elfmeter-verschossen")) type = "Missed";
+            }
+            else if (aktionText.Contains("Penalty", StringComparison.OrdinalIgnoreCase) || aktionText.Contains("Elfmeter", StringComparison.OrdinalIgnoreCase))
+            {
+                if (aktionText.Contains("Missed", StringComparison.OrdinalIgnoreCase) || aktionText.Contains("verschossen", StringComparison.OrdinalIgnoreCase))
+                    type = "Missed";
+                else
+                    type = "Scored";
+            }
+            
+            if (type == null) continue;
+            
+            var uhrElement = item.QuerySelector("div.sb-aktion-uhr span.sb-sprite-uhr-klein");
+            if (uhrElement == null) continue;
+            var minute = ParseMinuteFromSprite(uhrElement);
+            
+            
+            penalties.Add(new PenaltyEvent
+            {
+                Minute = minute,
+                IsHomeTeam = isHome,
+                Type = type,
+                Reason = aktionText.Trim()
+            });
+        }
+        
+        return penalties;
+    }
+
+    private static int ParseMinuteFromSprite(IElement uhrElement)
+    {
+        var style = uhrElement.GetAttribute("style") ?? "";
+        var match = System.Text.RegularExpressions.Regex.Match(style, @"background-position:\s*-(\d+)px\s*-(\d+)px");
+        if (!match.Success) return 0;
+        
+        var x = int.Parse(match.Groups[1].Value) / 36;
+        var y = int.Parse(match.Groups[2].Value) / 36;
+        
+        var minute = (y * 10) + x + 1;
+        
+        var text = uhrElement.TextContent.Trim();
+        if (text.StartsWith("+") && int.TryParse(text.TrimStart('+'), out var extra))
+        {
+            minute += extra; 
+        }
+        
+        return minute;
+    }
 }
 
 /// <summary>Intermediate model for match summaries extracted from league page.</summary>

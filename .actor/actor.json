@@ -5,5 +5,8 @@
   "description": "Scrapes football referee statistics (cards, penalties, matches) from Transfermarkt, per league/season, with incremental updates.",
   "version": "0.1",
   "dockerfile": "./Dockerfile",
-  "input": "./input_schema.json"
+  "input": "./input_schema.json",
+  "categories": ["SPORTS", "DATA_EXTRACTION"],
+  "pictureUrl": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=200&auto=format&fit=crop",
+  "licenseId": "MIT"
 }
