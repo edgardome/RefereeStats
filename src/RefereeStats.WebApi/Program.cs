@@ -1,9 +1,12 @@
 using AspNetCoreRateLimit;
 using RefereeStats.Core.Scraping;
-using RefereeStats.WebApi;
 using Serilog;
-
 using RefereeStats.WebApi.Services;
+using RefereeStats.WebApi;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +28,39 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddSingleton<AuthService>();
 builder.Services.AddRefereeScraping();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "RefereeStatsAPI",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "RefereeStatsDashboard",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "super_secret_fallback_key_that_should_be_long_enough_in_production"))
+    };
+})
+.AddScheme<RapidApiAuthOptions, RapidApiAuthHandler>("RapidApiProxySecret", null);
+
+builder.Services.AddAuthorization(options =>
+{
+    // Require EITHER a valid JWT or a valid RapidAPI Secret
+    var defaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme, "RapidApiProxySecret")
+        .RequireAuthenticatedUser()
+        .Build();
+    
+    options.DefaultPolicy = defaultPolicy;
+    options.FallbackPolicy = defaultPolicy; // Global protection by default
+});
 builder.Services.AddHostedService<MatchSyncBackgroundService>();
 
 // Rate limiting propio como red de seguridad adicional, independiente del de RapidAPI.
@@ -47,10 +82,7 @@ app.UseStaticFiles();
 
 app.UseIpRateLimiting();
 
-app.UseWhen(
-    context => context.Request.Path.StartsWithSegments("/api"),
-    appBuilder => appBuilder.UseMiddleware<RapidApiProxySecretMiddleware>()
-);
+app.UseAuthentication();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -59,6 +91,7 @@ if (!app.Environment.IsDevelopment())
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+   .AllowAnonymous();
 
 app.Run();

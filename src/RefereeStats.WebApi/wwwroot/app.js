@@ -1,3 +1,23 @@
+// Fetch Interceptor for JWT
+const originalFetch = window.fetch;
+window.fetch = async function () {
+    let [resource, config] = arguments;
+    if (!config) config = {};
+    if (!config.headers) config.headers = {};
+    
+    const token = sessionStorage.getItem('jwt_token');
+    if (token && resource.startsWith('/api')) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await originalFetch(resource, config);
+    if (response.status === 401) {
+        sessionStorage.removeItem('jwt_token');
+        window.location.href = '/login.html';
+    }
+    return response;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const leagueSelect = document.getElementById('league-select');
     const seasonSelect = document.getElementById('season-select');
