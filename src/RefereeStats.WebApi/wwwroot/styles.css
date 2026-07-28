@@ -963,6 +963,7 @@ input:checked + .slider:before {
     padding: 2.5rem;
     text-align: center;
     border-top: 4px solid var(--accent-primary);
+    overflow: visible;
 }
 
 .premium-badge {

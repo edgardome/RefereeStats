@@ -231,47 +231,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateLanguage() {
-        currentLang = langSelect.value;
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            if (translations[currentLang][key]) {
-                el.textContent = translations[currentLang][key];
+        try {
+            currentLang = langSelect.value;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+            
+            // Re-load labels dependent on JS state
+            if (refereeSelect.disabled) {
+                refereeSelect.innerHTML = `<option value="">${t('selectLeagueSeasonFirst')}</option>`;
             }
-        });
-        
-        // Re-load labels dependent on JS state
-        if (refereeSelect.disabled) {
-            refereeSelect.innerHTML = `<option value="">${t('selectLeagueSeasonFirst')}</option>`;
-        }
-        
-        // Also update the selectTeam dropdowns if they are in their default state
-        const tsSelect = document.getElementById('team-stats-select');
-        if (tsSelect && tsSelect.options.length === 1 && tsSelect.options[0].value === "") {
-            tsSelect.innerHTML = `<option value="">${t('selectTeam')}</option>`;
-        }
-        const htInput = document.getElementById('home-team-input');
-        if (htInput && htInput.options.length === 1 && htInput.options[0].value === "") {
-            htInput.innerHTML = `<option value="">${t('homeTeamSearch')}</option>`;
-        }
-        const atInput = document.getElementById('away-team-input');
-        if (atInput && atInput.options.length === 1 && atInput.options[0].value === "") {
-            atInput.innerHTML = `<option value="">${t('awayTeamSearch')}</option>`;
-        }
-        
-        const mCount = document.getElementById('matches-count');
-        if (mCount) {
-            const count = parseInt(mCount.textContent) || 0;
-            mCount.textContent = `${count} ${t('matchesText')}`;
-        }
+            
+            // Also update the selectTeam dropdowns if they are in their default state
+            const tsSelect = document.getElementById('team-stats-select');
+            if (tsSelect && tsSelect.options.length === 1 && tsSelect.options[0].value === "") {
+                tsSelect.innerHTML = `<option value="">${t('selectTeam')}</option>`;
+            }
+            const htInput = document.getElementById('home-team-input');
+            if (htInput && htInput.options.length === 1 && htInput.options[0].value === "") {
+                htInput.innerHTML = `<option value="">${t('homeTeamSearch')}</option>`;
+            }
+            const atInput = document.getElementById('away-team-input');
+            if (atInput && atInput.options.length === 1 && atInput.options[0].value === "") {
+                atInput.innerHTML = `<option value="">${t('awayTeamSearch')}</option>`;
+            }
+            
+            const mCount = document.getElementById('matches-count');
+            if (mCount) {
+                const count = parseInt(mCount.textContent) || 0;
+                mCount.textContent = `${count} ${t('matchesText')}`;
+            }
 
-        document.getElementById('sync-button').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> ${t('syncLeague')}`;
-        document.getElementById('leaderboard-button').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8M6 20V4M18 20v-4"/></svg> ${t('leaderboard')}`;
-        
-        // Force reload of texts
-        if(refereeSelect.value) {
-            handleRefereeChange();
-        } else {
-            loadReferees();
+            if(refereeSelect.value) {
+                handleRefereeChange();
+            } else {
+                loadReferees();
+            }
+        } catch (e) {
+            console.error(e);
         }
     }
 
@@ -280,15 +280,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial Translation Application
     updateLanguage();
 
-    const btnLogout = document.getElementById('btn-logout');
+    const btnLogout = document.getElementById('logout-btn');
     const authLoginBtn = document.getElementById('auth-login-btn');
     
+    console.log("Auth Check:", sessionStorage.getItem('jwt_token') ? "LOGGED IN" : "NOT LOGGED IN");
+    
     if (sessionStorage.getItem('jwt_token')) {
-        if (btnLogout) btnLogout.style.display = 'block';
-        if (authLoginBtn) authLoginBtn.style.display = 'none';
+        if (btnLogout) {
+            btnLogout.style.setProperty('display', 'flex', 'important');
+            console.log("Logout button set to visible");
+        }
+        if (authLoginBtn) authLoginBtn.style.setProperty('display', 'none', 'important');
     } else {
-        if (btnLogout) btnLogout.style.display = 'none';
-        if (authLoginBtn) authLoginBtn.style.display = 'block';
+        if (btnLogout) btnLogout.style.setProperty('display', 'none', 'important');
+        if (authLoginBtn) authLoginBtn.style.setProperty('display', 'block', 'important');
     }
 
     if (btnLogout) {
