@@ -30,4 +30,19 @@ public sealed class AuthController(AuthService authService) : ControllerBase
 
         return Ok(new { token });
     }
+
+    [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public ActionResult Register([FromBody] LoginRequest request)
+    {
+        var token = authService.RegisterUser(request.Email, request.Password);
+
+        if (token == null)
+        {
+            return BadRequest(new { message = "User already exists or invalid data" });
+        }
+
+        return Ok(new { token });
+    }
 }

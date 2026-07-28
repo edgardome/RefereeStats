@@ -1,19 +1,26 @@
 // Fetch Interceptor for JWT
 const originalFetch = window.fetch;
-window.fetch = async function () {
-    let [resource, config] = arguments;
-    if (!config) config = {};
-    if (!config.headers) config.headers = {};
-    
-    const token = sessionStorage.getItem('jwt_token');
-    if (token && resource.startsWith('/api')) {
-        config.headers['Authorization'] = `Bearer ${token}`;
+window.fetch = async (resource, config) => {
+    let url = resource;
+    if (resource instanceof Request) {
+        url = resource.url;
     }
-    
+
+    const isAuthRequest = url.includes('/api/auth/login') || url.includes('/api/auth/register') || url.includes('/api/payments/');
+    if (!isAuthRequest) {
+        const token = sessionStorage.getItem('jwt_token');
+        if (token) {
+            config = config || {};
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+    }
+
     const response = await originalFetch(resource, config);
     if (response.status === 401) {
         sessionStorage.removeItem('jwt_token');
-        window.location.href = '/login.html?premium=true';
+        showPremiumModal();
+        return Promise.reject('Unauthorized - Premium Required');
     }
     return response;
 };
@@ -59,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             noRefSelected: "No Referee Selected",
             selectRefLoad: "Select a referee to load profile",
             debutDate: "Debut Date",
-            totalCacheMatches: "Total Cache Matches",
+            totalCacheMatches: "Matches",
             biasDesc: "Calculated card and penalty distribution between Home and Away teams",
             strongAwayBias: "STRONG AWAY BIAS",
             balanced: "BALANCED",
@@ -82,7 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
             thAwayTeam: "Away Team",
             thCards: "Cards Issued",
             matchesText: "Matches",
-            selectRefMatchHistory: "Select a referee to view match history"
+            selectRefMatchHistory: "Select a referee to view match history",
+            premiumTitle: "Unlock Premium Analytics",
+            premiumDesc: "Get full access to Matchup Predictor, cross-league Global Stats, and complete referee historical data.",
+            subscribeBtn: "Upgrade Now",
+            orText: "OR",
+            alreadyHaveAccount: "I already have an account",
+            loginBtn: "Login / PRO"
         },
         es: {
             darkMode: "Modo Oscuro",
@@ -115,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             noRefSelected: "Ningún Árbitro Seleccionado",
             selectRefLoad: "Selecciona un árbitro para ver su perfil",
             debutDate: "Fecha de Debut",
-            totalCacheMatches: "Partidos en Caché",
+            totalCacheMatches: "Partidos",
             biasDesc: "Distribución calculada de tarjetas y penaltis entre local y visitante",
             strongAwayBias: "SESGO VISITANTE",
             balanced: "EQUILIBRADO",
@@ -138,7 +151,13 @@ document.addEventListener('DOMContentLoaded', () => {
             thAwayTeam: "Equipo Visit.",
             thCards: "Tarjetas",
             matchesText: "Partidos",
-            selectRefMatchHistory: "Selecciona un árbitro para ver su historial"
+            selectRefMatchHistory: "Selecciona un árbitro para ver su historial",
+            premiumTitle: "Desbloquea Analítica Premium",
+            premiumDesc: "Accede al Predictor de Enfrentamientos, Estadísticas Globales cruzadas y todo el historial del árbitro.",
+            subscribeBtn: "Mejorar Ahora",
+            orText: "O",
+            alreadyHaveAccount: "Ya tengo una cuenta",
+            loginBtn: "Login / PRO"
         },
         de: {
             darkMode: "Dunkelmodus",
@@ -171,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             noRefSelected: "Kein Schiedsrichter Ausgewählt",
             selectRefLoad: "Schiedsrichter wählen um Profil zu laden",
             debutDate: "Debütdatum",
-            totalCacheMatches: "Gesamte Spiele im Cache",
+            totalCacheMatches: "Spiele",
             biasDesc: "Berechnete Karten- und Elfmeterverteilung zwischen Heim und Auswärts",
             strongAwayBias: "STARK AUSWÄRTS",
             balanced: "AUSGEGLICHEN",
@@ -194,7 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
             thAwayTeam: "Auswärtsteam",
             thCards: "Karten Gegeben",
             matchesText: "Spiele",
-            selectRefMatchHistory: "Schiedsrichter wählen um Spielverlauf zu sehen"
+            selectRefMatchHistory: "Schiedsrichter wählen um Spielverlauf zu sehen",
+            premiumTitle: "Premium-Analyse freischalten",
+            premiumDesc: "Voller Zugriff auf Matchup-Vorhersagen, ligaübergreifende Statistiken und die komplette Historie.",
+            subscribeBtn: "Jetzt Upgraden",
+            orText: "ODER",
+            alreadyHaveAccount: "Ich habe bereits ein Konto",
+            loginBtn: "Login / PRO"
         }
     };
 
@@ -254,19 +279,115 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial Translation Application
     updateLanguage();
 
-    // Logout Logic
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
+    const btnLogout = document.getElementById('btn-logout');
+    const authLoginBtn = document.getElementById('auth-login-btn');
+    
+    if (sessionStorage.getItem('jwt_token')) {
+        if (btnLogout) btnLogout.style.display = 'block';
+        if (authLoginBtn) authLoginBtn.style.display = 'none';
+    } else {
+        if (btnLogout) btnLogout.style.display = 'none';
+        if (authLoginBtn) authLoginBtn.style.display = 'block';
+    }
+
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
             sessionStorage.removeItem('jwt_token');
+            window.location.href = '/index.html';
+        });
+    }
+    
+    if (authLoginBtn) {
+        authLoginBtn.addEventListener('click', () => {
             window.location.href = '/login.html';
         });
-        
-        // Hide logout button if user is not logged in
-        if (!sessionStorage.getItem('jwt_token')) {
-            logoutBtn.style.display = 'none';
+    }
+    
+    // Check if user just paid
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success' || urlParams.get('payment') === 'mock_success') {
+        showToast('Payment successful! Your account is now Premium.', 5000);
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    // Premium Modal Logic
+    const premiumModal = document.getElementById('premium-modal');
+    function showPremiumModal() {
+        if (premiumModal) {
+            premiumModal.classList.remove('hidden');
         }
     }
+    
+    document.getElementById('btn-close-modal')?.addEventListener('click', () => {
+        premiumModal.classList.add('hidden');
+        // Revert league select to LaLiga 2 (free) so they don't get stuck
+        if (leagueSelect) {
+            leagueSelect.value = 'LaLiga 2';
+            loadReferees();
+        }
+    });
+    
+    document.getElementById('btn-login-redirect')?.addEventListener('click', () => {
+        window.location.href = '/login.html';
+    });
+    
+    document.getElementById('btn-subscribe')?.addEventListener('click', () => {
+        document.getElementById('btn-subscribe').style.display = 'none';
+        document.getElementById('fast-signup-form').style.display = 'block';
+    });
+    
+    document.getElementById('btn-submit-signup')?.addEventListener('click', async () => {
+        const email = document.getElementById('cta-email').value;
+        const password = document.getElementById('cta-password').value;
+        const errLabel = document.getElementById('cta-error');
+        
+        if (!email || !password) {
+            errLabel.textContent = 'Please enter email and password';
+            errLabel.style.display = 'block';
+            return;
+        }
+        
+        errLabel.style.display = 'none';
+        
+        try {
+            // Register
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            if (!res.ok) {
+                const errData = await res.json();
+                errLabel.textContent = errData.message || 'Registration failed';
+                errLabel.style.display = 'block';
+                return;
+            }
+            
+            const data = await res.json();
+            sessionStorage.setItem('jwt_token', data.token); // Logged in!
+            
+            // Go to checkout
+            const checkoutRes = await fetch('/api/v1/payments/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            
+            if (checkoutRes.ok) {
+                const checkoutData = await checkoutRes.json();
+                window.location.href = checkoutData.url;
+            } else {
+                errLabel.textContent = 'Error initiating checkout';
+                errLabel.style.display = 'block';
+            }
+            
+        } catch (err) {
+            console.error(err);
+            errLabel.textContent = 'Network error. Please try again.';
+            errLabel.style.display = 'block';
+        }
+    });
 
     // Stats Panel Elements
     const refCard = document.getElementById('referee-card');
