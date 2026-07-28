@@ -17,6 +17,12 @@ public sealed class RefereeAnalytics
     public decimal AwayCardsPercentage { get; init; }
     public decimal HomePenaltiesPercentage { get; init; }
     public decimal AwayPenaltiesPercentage { get; init; }
+
+    // Win ratios — overall match outcome distribution for this referee
+    public int TotalMatchesAnalyzed { get; init; }
+    public decimal HomeWinRatio { get; init; }
+    public decimal AwayWinRatio { get; init; }
+    public decimal DrawRatio { get; init; }
     
     public List<RefereeTeamHistory> RefereeTeamHistory { get; init; } = [];
 }

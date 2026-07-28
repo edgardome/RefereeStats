@@ -9,7 +9,8 @@ using RefereeStats.WebApi.Services;
 namespace RefereeStats.WebApi.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/v1")]
+[Route("api")] // backward-compatible: old /api routes still work
 public sealed class RefereesController(RefereeScraper scraper, IConfiguration configuration, IMemoryCache cache) : ControllerBase
 {
     /// <summary>Nivel 1: perfil agregado por temporada de un árbitro.</summary>
@@ -35,26 +36,28 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
 
     /// <summary>Nivel 1c: desglose por temporada de un árbitro dentro de una competición concreta.</summary>
     [HttpGet("referees/{refereeId}/competitions/{league}/history")]
-    [ProducesResponseType<IReadOnlyList<RefereeProfile>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<RefereeProfile>>> GetCompetitionHistory(
-        string refereeId, string league, CancellationToken ct)
+    [ProducesResponseType<PagedResponse<RefereeProfile>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResponse<RefereeProfile>>> GetCompetitionHistory(
+        string refereeId, string league, [FromQuery] int page = 0, [FromQuery] int size = 20, CancellationToken ct = default)
     {
         var history = await scraper.GetRefereeCompetitionHistoryAsync(refereeId, league, ct);
-        return Ok(history);
+        return Ok(PagedResponse<RefereeProfile>.Create(history, page, size));
     }
 
-    /// <summary>Level 2: Matches officiated, optionally filtered by date (incremental). Reads from local reverse index.</summary>
+    /// <summary>Level 2: Matches officiated, optionally filtered by date (incremental). Paginated. Reads from local reverse index.</summary>
     [HttpGet("referees/{refereeId}/matches")]
-    [ProducesResponseType<IReadOnlyList<GranularMatchReport>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<GranularMatchReport>>> GetMatches(
-        string refereeId, [FromQuery] string league, [FromQuery] string season, [FromQuery] DateOnly? since, [FromQuery] bool global = false, CancellationToken ct = default)
+    [ProducesResponseType<PagedResponse<GranularMatchReport>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResponse<GranularMatchReport>>> GetMatches(
+        string refereeId, [FromQuery] string league, [FromQuery] string season,
+        [FromQuery] DateOnly? since, [FromQuery] bool global = false,
+        [FromQuery] int page = 0, [FromQuery] int size = 20, CancellationToken ct = default)
     {
         var matches = await LoadMatchesFromCacheAsync(league, season, refereeId, global, ct);
         if (since.HasValue)
         {
             matches = matches.Where(m => m.Date >= since.Value).ToList();
         }
-        return Ok(matches);
+        return Ok(PagedResponse<GranularMatchReport>.Create(matches, page, size));
     }
 
     [HttpGet("referees/{refereeId}/analytics")]
@@ -92,6 +95,11 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
                     AwayCardsPercentage = analytics.AwayCardsPercentage,
                     HomePenaltiesPercentage = analytics.HomePenaltiesPercentage,
                     AwayPenaltiesPercentage = analytics.AwayPenaltiesPercentage,
+
+                    TotalMatchesAnalyzed = analytics.TotalMatchesAnalyzed,
+                    HomeWinRatio = analytics.HomeWinRatio,
+                    AwayWinRatio = analytics.AwayWinRatio,
+                    DrawRatio = analytics.DrawRatio,
 
                     RefereeTeamHistory = analytics.RefereeTeamHistory
                 };
@@ -158,11 +166,11 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
             .ToList();
     }
 
-    /// <summary>Listado de árbitros disponibles para una liga/temporada.</summary>
+    /// <summary>Listado paginado de árbitros disponibles para una liga/temporada.</summary>
     [HttpGet("leagues/{league}/referees")]
-    [ProducesResponseType<IReadOnlyList<RefereeProfile>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<RefereeProfile>>> GetLeagueReferees(
-        string league, [FromQuery] string season, CancellationToken ct)
+    [ProducesResponseType<PagedResponse<RefereeProfile>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResponse<RefereeProfile>>> GetLeagueReferees(
+        string league, [FromQuery] string season, [FromQuery] int page = 0, [FromQuery] int size = 20, CancellationToken ct = default)
     {
         var cacheKey = $"referees_{league}_{season}";
         if (!cache.TryGetValue(cacheKey, out IReadOnlyList<RefereeProfile>? profiles) || profiles == null || profiles.Count == 0)
@@ -180,7 +188,7 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
             cache.Set(cacheKey, profiles, TimeSpan.FromMinutes(60));
         }
 
-        return Ok(profiles);
+        return Ok(PagedResponse<RefereeProfile>.Create(profiles, page, size));
     }
 
     /// <summary>Synchronizes all supported leagues from configuration (incremental).</summary>

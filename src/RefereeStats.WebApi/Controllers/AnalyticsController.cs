@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using RefereeStats.Core.Models;
 using RefereeStats.Core.Scraping;
 using RefereeStats.WebApi.Services;
@@ -7,16 +6,18 @@ using RefereeStats.WebApi.Services;
 namespace RefereeStats.WebApi.Controllers;
 
 [ApiController]
-[Route("api/analytics")]
-public sealed class AnalyticsController(IMemoryCache cache, RefereeScraper scraper) : ControllerBase
+[Route("api/v1/analytics")]
+[Route("api/analytics")] // backward-compatible
+public sealed class AnalyticsController() : ControllerBase
 {
     [HttpGet("leagues/{league}/leaderboard")]
-    [ProducesResponseType<IReadOnlyList<RefereeLeaderboardEntry>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<RefereeLeaderboardEntry>>> GetLeaderboard(
-        string league, [FromQuery] string season, [FromQuery] string sortBy = "strictness", CancellationToken ct = default)
+    [ProducesResponseType<PagedResponse<RefereeLeaderboardEntry>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResponse<RefereeLeaderboardEntry>>> GetLeaderboard(
+        string league, [FromQuery] string season, [FromQuery] string sortBy = "strictness",
+        [FromQuery] int page = 0, [FromQuery] int size = 20, CancellationToken ct = default)
     {
         var matches = await MatchCacheService.LoadAllMatchesFromCacheAsync(league, season, ct);
-        if (matches.Count == 0) return Ok(new List<RefereeLeaderboardEntry>());
+        if (matches.Count == 0) return Ok(PagedResponse<RefereeLeaderboardEntry>.Create([], page, size));
 
         var matchesByReferee = matches.Where(m => !string.IsNullOrEmpty(m.RefereeId)).GroupBy(m => m.RefereeId!).ToList();
         var leaderboard = new List<RefereeLeaderboardEntry>();
@@ -35,7 +36,10 @@ public sealed class AnalyticsController(IMemoryCache cache, RefereeScraper scrap
                 MatchesOfficiated = refMatches.Count,
                 AverageYellowCards = analytics.AverageYellowCards,
                 AverageRedCards = analytics.AverageDirectRedCards,
-                HomeBiasPercentage = analytics.HomeCardsPercentage
+                HomeBiasPercentage = analytics.HomeCardsPercentage,
+                HomeWinRatio = analytics.HomeWinRatio,
+                AwayWinRatio = analytics.AwayWinRatio,
+                DrawRatio = analytics.DrawRatio,
             });
         }
 
@@ -53,7 +57,7 @@ public sealed class AnalyticsController(IMemoryCache cache, RefereeScraper scrap
             leaderboard[i].Rank = i + 1;
         }
 
-        return Ok(leaderboard);
+        return Ok(PagedResponse<RefereeLeaderboardEntry>.Create(leaderboard, page, size));
     }
 
     [HttpGet("matchup-preview")]
@@ -121,6 +125,11 @@ public sealed class AnalyticsController(IMemoryCache cache, RefereeScraper scrap
             highlights.Add("Referee A gives proportionally more cards to home teams than Referee B.");
         else if (analyticsB.HomeCardsPercentage > analyticsA.HomeCardsPercentage + 5)
             highlights.Add("Referee B gives proportionally more cards to home teams than Referee A.");
+
+        if (analyticsA.HomeWinRatio > analyticsB.HomeWinRatio + 0.1m)
+            highlights.Add($"Home teams win more often with Referee A ({analyticsA.HomeWinRatio:P0} vs {analyticsB.HomeWinRatio:P0}).");
+        else if (analyticsB.HomeWinRatio > analyticsA.HomeWinRatio + 0.1m)
+            highlights.Add($"Home teams win more often with Referee B ({analyticsB.HomeWinRatio:P0} vs {analyticsA.HomeWinRatio:P0}).");
 
         if (highlights.Count == 0) highlights.Add("Both referees have very similar profiles.");
 

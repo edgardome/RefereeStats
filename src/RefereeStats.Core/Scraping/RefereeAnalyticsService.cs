@@ -49,6 +49,13 @@ public static class RefereeAnalyticsService
         var homePenaltiesPct = totalPenalties == 0 ? 50m : Math.Round(((decimal)homePenalties / totalPenalties) * 100, 2);
         var awayPenaltiesPct = totalPenalties == 0 ? 50m : Math.Round(((decimal)awayPenalties / totalPenalties) * 100, 2);
 
+        // Win ratios — parsed from match scores
+        var (homeWins, awayWins, draws) = ComputeWinRatios(matches);
+        var matchCount = (decimal)matches.Count;
+        var homeWinRatio = Math.Round(homeWins / matchCount, 2);
+        var awayWinRatio = Math.Round(awayWins / matchCount, 2);
+        var drawRatio = Math.Round(draws / matchCount, 2);
+
         return new RefereeAnalytics
         {
             RefereeId = refereeId,
@@ -65,8 +72,31 @@ public static class RefereeAnalyticsService
             HomePenaltiesPercentage = homePenaltiesPct,
             AwayPenaltiesPercentage = awayPenaltiesPct,
 
+            TotalMatchesAnalyzed = matches.Count,
+            HomeWinRatio = homeWinRatio,
+            AwayWinRatio = awayWinRatio,
+            DrawRatio = drawRatio,
+
             RefereeTeamHistory = teamHistory,
         };
+    }
+
+    /// <summary>Counts home wins, away wins, and draws by parsing match scores.</summary>
+    private static (int HomeWins, int AwayWins, int Draws) ComputeWinRatios(IReadOnlyList<GranularMatchReport> matches)
+    {
+        int homeWins = 0, awayWins = 0, draws = 0;
+        foreach (var match in matches)
+        {
+            if (string.IsNullOrWhiteSpace(match.FinalScore)) continue;
+            var scoreStr = match.FinalScore.Split(' ')[0]; // "2:1" from "2:1 AET"
+            var parts = scoreStr.Split(':');
+            if (parts.Length != 2 || !int.TryParse(parts[0], out var h) || !int.TryParse(parts[1], out var a)) continue;
+
+            if (h > a) homeWins++;
+            else if (a > h) awayWins++;
+            else draws++;
+        }
+        return (homeWins, awayWins, draws);
     }
 
     /// <summary>Home cards / Away cards ratio. If away = 0, returns 0.</summary>

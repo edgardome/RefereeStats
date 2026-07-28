@@ -323,12 +323,26 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
         var flagImg = row.QuerySelector("img.flaggenrahmen");
         var nationality = flagImg?.GetAttribute("alt")?.Trim();
 
-        var allCells = row.QuerySelectorAll("td").ToArray();
         var centeredCells = row.QuerySelectorAll("td.zentriert").Select(c => c.TextContent.Trim()).ToArray();
-        var rightCell = row.QuerySelector("td.rechts")?.TextContent.Trim();
 
-        var debutText = centeredCells.ElementAtOrDefault(0) ?? string.Empty;
-        var appearances = ParseInt(centeredCells.ElementAtOrDefault(1));
+        // Leagues layout:  [0]=debut  [1]=appearances  [2]=yellow ...
+        // Cups layout:     [0]=total_yellows_alltime  [1]=appearances  [2]=avg_yellow ... [n-2]=debut  [n-1]=season_total
+        // Detect by checking whether index 0 looks like a date.
+        bool hasDebutFirst = TryParseDateFromText(centeredCells.ElementAtOrDefault(0) ?? string.Empty, out var debutFromFirst);
+        DateOnly? debutDate;
+        int appearances;
+        if (hasDebutFirst)
+        {
+            debutDate = debutFromFirst;
+            appearances = ParseInt(centeredCells.ElementAtOrDefault(1));
+        }
+        else
+        {
+            // Cup layout: debut is second-to-last centered cell
+            appearances = ParseInt(centeredCells.ElementAtOrDefault(1));
+            var debutCandidate = centeredCells.Length >= 2 ? centeredCells[^2] : string.Empty;
+            debutDate = TryParseDateFromText(debutCandidate, out var d) ? d : null;
+        }
 
         int yellowCards = 0, secondYellow = 0, redCards = 0, penalties = 0;
         decimal avgYellow = 0m, avgSecondYellow = 0m, avgRed = 0m, avgPenalties = 0m;
@@ -369,7 +383,7 @@ public sealed class RefereeScraper(TransfermarktClient client, ILogger logger)
             Nationality = string.IsNullOrWhiteSpace(nationality) ? null : nationality,
             League = league,
             Season = season,
-            DebutDate = TryParseDateFromText(debutText, out var debut) ? debut : null,
+            DebutDate = debutDate,
             MatchesOfficiated = appearances,
             YellowCards = yellowCards,
             AverageYellowCards = avgYellow,

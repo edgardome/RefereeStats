@@ -18,9 +18,20 @@ public sealed class MatchSyncBackgroundService(
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
+    private static readonly string StateFilePath = Path.Combine(Environment.CurrentDirectory, "App_Data", "synced_historical.txt");
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        Directory.CreateDirectory(Path.GetDirectoryName(StateFilePath)!);
+        if (File.Exists(StateFilePath))
+        {
+            var lines = File.ReadAllLines(StateFilePath);
+            foreach (var line in lines)
+            {
+                if (!string.IsNullOrWhiteSpace(line)) _completedHistoricalTargets.Add(line.Trim());
+            }
+        }
+
         var section = configuration.GetSection("SyncSettings");
         var enabled = section.GetValue("Enabled", true);
         if (!enabled)
@@ -81,6 +92,7 @@ public sealed class MatchSyncBackgroundService(
                 if (IsSeasonFinished(season))
                 {
                     _completedHistoricalTargets.Add(targetKey);
+                    File.AppendAllLines(StateFilePath, new[] { targetKey });
                     Log.Information("Background Sync: Target {League} ({Season}) is historical and fully synced. Skipping in future loops.", league, season);
                 }
             }

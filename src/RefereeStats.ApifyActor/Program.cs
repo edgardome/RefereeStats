@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using RefereeStats.ApifyActor;
 using RefereeStats.Core.Export;
+using RefereeStats.Core.Models;
 using RefereeStats.Core.Scraping;
 using Serilog;
 

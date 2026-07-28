@@ -8,6 +8,9 @@ public class RefereeLeaderboardEntry
     public decimal AverageRedCards { get; set; }
     public decimal HomeBiasPercentage { get; set; }
     public int MatchesOfficiated { get; set; }
+    public decimal HomeWinRatio { get; set; }
+    public decimal AwayWinRatio { get; set; }
+    public decimal DrawRatio { get; set; }
 }
 
 public class MatchupPreview
