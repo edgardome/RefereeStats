@@ -62,8 +62,6 @@ static async Task RunAsync(ServiceProvider provider)
     var scraper = provider.GetRequiredService<RefereeScraper>();
     var exporter = provider.GetRequiredService<ExportService>();
 
-    await apifyClient.ChargeEventAsync("actor-start");
-
     if (input.Mode == "matches")
     {
         var matchIds = await scraper.GetMatchdayCalendarAsync(input.League, input.Season);
