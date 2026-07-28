@@ -19,6 +19,8 @@ public sealed class AnalyticsController() : ControllerBase
         var matches = await MatchCacheService.LoadAllMatchesFromCacheAsync(league, season, ct);
         if (matches.Count == 0) return Ok(PagedResponse<RefereeLeaderboardEntry>.Create([], page, size));
 
+        var refereeProfiles = await MatchCacheService.LoadRefereesFromCacheAsync(league, season, ct);
+
         var matchesByReferee = matches.Where(m => !string.IsNullOrEmpty(m.RefereeId)).GroupBy(m => m.RefereeId!).ToList();
         var leaderboard = new List<RefereeLeaderboardEntry>();
 
@@ -29,10 +31,12 @@ public sealed class AnalyticsController() : ControllerBase
             if (refMatches.Count < 3) continue; // Skip referees with too few matches
 
             var analytics = RefereeAnalyticsService.ComputeAnalytics(refId, refMatches);
+            var refName = refereeProfiles?.FirstOrDefault(r => r.RefereeId == refId)?.Name;
 
             leaderboard.Add(new RefereeLeaderboardEntry
             {
                 RefereeId = refId,
+                RefereeName = refName,
                 MatchesOfficiated = refMatches.Count,
                 AverageYellowCards = analytics.AverageYellowCards,
                 AverageRedCards = analytics.AverageDirectRedCards,

@@ -48,7 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
             noMatches: "No match reports in cache for this referee in this league/season.",
             errorMatches: "Error loading match reports.",
             syncing: "Syncing...",
-            syncComplete: "Sync Complete"
+            syncComplete: "Sync Complete",
+            leagueLabel: "League",
+            seasonLabel: "Season",
+            refereeLabel: "Referee",
+            homeVsAway: "Home vs Away Bias",
+            refVsTeam: "Referee vs Team Statistics",
+            matchHistory: "Match History",
+            logout: "Logout"
         },
         es: {
             darkMode: "Modo Oscuro",
@@ -70,7 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
             noMatches: "No hay partidos en caché para este árbitro en esta liga/temporada.",
             errorMatches: "Error al cargar los partidos.",
             syncing: "Sincronizando...",
-            syncComplete: "Sincronización Completa"
+            syncComplete: "Sincronización Completa",
+            leagueLabel: "Liga",
+            seasonLabel: "Temporada",
+            refereeLabel: "Árbitro",
+            homeVsAway: "Sesgo Local vs Visitante",
+            refVsTeam: "Estadísticas Árbitro vs Equipo",
+            matchHistory: "Historial de Partidos",
+            logout: "Cerrar Sesión"
         },
         de: {
             darkMode: "Dunkelmodus",
@@ -92,7 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
             noMatches: "Keine Spiele im Cache für diesen Schiedsrichter gefunden.",
             errorMatches: "Fehler beim Laden der Spiele.",
             syncing: "Wird synchronisiert...",
-            syncComplete: "Synchronisation Abgeschlossen"
+            syncComplete: "Synchronisation Abgeschlossen",
+            leagueLabel: "Liga",
+            seasonLabel: "Saison",
+            refereeLabel: "Schiedsrichter",
+            homeVsAway: "Heim vs Auswärts Tendenz",
+            refVsTeam: "Schiedsrichter vs Team",
+            matchHistory: "Spielverlauf",
+            logout: "Abmelden"
         }
     };
 
@@ -127,6 +148,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     langSelect.addEventListener('change', updateLanguage);
+
+    // Initial Translation Application
+    updateLanguage();
+
+    // Logout Logic
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('jwt_token');
+            window.location.href = '/login.html';
+        });
+        
+        // Hide logout button if user is not logged in
+        if (!sessionStorage.getItem('jwt_token')) {
+            logoutBtn.style.display = 'none';
+        }
+    }
 
     // Stats Panel Elements
     const refCard = document.getElementById('referee-card');
@@ -484,10 +522,11 @@ document.addEventListener('DOMContentLoaded', () => {
             leaderboardTbody.innerHTML = '';
             data.forEach(ref => {
                 const tr = document.createElement('tr');
-                // We resolve the name from the existing refereeSelect dropdown if possible
-                let name = ref.refereeId;
-                const opt = Array.from(refereeSelect.options).find(o => o.value === ref.refereeId);
-                if (opt) name = opt.textContent.split('(')[0].trim();
+                let name = ref.refereeName || ref.refereeId;
+                if (name === ref.refereeId) {
+                    const opt = Array.from(refereeSelect.options).find(o => o.value === ref.refereeId);
+                    if (opt) name = opt.textContent.split('(')[0].trim();
+                }
                 
                 tr.innerHTML = `
                     <td>#${ref.rank}</td>

@@ -3,6 +3,7 @@ namespace RefereeStats.Core.Models;
 public class RefereeLeaderboardEntry
 {
     public required string RefereeId { get; set; }
+    public string? RefereeName { get; set; }
     public int Rank { get; set; }
     public decimal AverageYellowCards { get; set; }
     public decimal AverageRedCards { get; set; }
