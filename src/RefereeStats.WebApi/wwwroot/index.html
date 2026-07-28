@@ -123,18 +123,18 @@
                     <div class="profile-header">
                         <div class="avatar-placeholder">Ref</div>
                         <div class="profile-name-group">
-                            <h2 id="ref-name">No Referee Selected</h2>
-                            <p id="ref-nationality">Select a referee to load profile</p>
+                            <h2 id="ref-name" data-i18n="noRefSelected">No Referee Selected</h2>
+                            <p id="ref-nationality" data-i18n="selectRefLoad">Select a referee to load profile</p>
                         </div>
                         <button id="compare-btn" class="btn-secondary btn-small hidden" title="Compare against another referee">VS</button>
                     </div>
                     <div class="profile-details-list">
                         <div class="detail-row">
-                            <span class="detail-label">Debut Date</span>
+                            <span class="detail-label" data-i18n="debutDate">Debut Date</span>
                             <span class="detail-value" id="ref-debut">-</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Total Cache Matches</span>
+                            <span class="detail-label" data-i18n="totalCacheMatches">Total Cache Matches</span>
                             <span class="detail-value" id="ref-total-matches">-</span>
                         </div>
                     </div>
@@ -188,16 +188,16 @@
                         <h3 data-i18n="homeVsAway">Home vs Away Bias</h3>
                         <span class="info-tag" id="bias-label">Neutral</span>
                     </div>
-                    <p class="panel-desc">Calculated card and penalty distribution between Home and Away teams</p>
+                    <p class="panel-desc" data-i18n="biasDesc">Calculated card and penalty distribution between Home and Away teams</p>
                     
                     <div class="bias-indicator-container">
                         <div class="bias-scale">
                             <div class="bias-marker" id="bias-marker" style="left: 50%;"></div>
                         </div>
                         <div class="bias-labels">
-                            <span>Strong Away Bias</span>
-                            <span>Balanced</span>
-                            <span>Strong Home Bias</span>
+                            <span data-i18n="strongAwayBias">Strong Away Bias</span>
+                            <span data-i18n="balanced">Balanced</span>
+                            <span data-i18n="strongHomeBias">Strong Home Bias</span>
                         </div>
                     </div>
 
@@ -226,7 +226,7 @@
                     <div class="panel-header">
                         <h3 data-i18n="refVsTeam">Referee vs Team Statistics</h3>
                     </div>
-                    <p class="panel-desc">Select a team to see their specific record with this referee</p>
+                    <p class="panel-desc" data-i18n="selectTeamRecord">Select a team to see their specific record with this referee</p>
                     
                     <div class="control-box" style="margin-bottom: 1.5rem;">
                         <select id="team-stats-select" disabled style="width: 100%; padding: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--color-text-main);">

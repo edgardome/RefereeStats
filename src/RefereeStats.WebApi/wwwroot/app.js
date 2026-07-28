@@ -55,7 +55,16 @@ document.addEventListener('DOMContentLoaded', () => {
             homeVsAway: "Home vs Away Bias",
             refVsTeam: "Referee vs Team Statistics",
             matchHistory: "Match History",
-            logout: "Logout"
+            logout: "Logout",
+            noRefSelected: "No Referee Selected",
+            selectRefLoad: "Select a referee to load profile",
+            debutDate: "Debut Date",
+            totalCacheMatches: "Total Cache Matches",
+            biasDesc: "Calculated card and penalty distribution between Home and Away teams",
+            strongAwayBias: "STRONG AWAY BIAS",
+            balanced: "BALANCED",
+            strongHomeBias: "STRONG HOME BIAS",
+            selectTeamRecord: "Select a team to see their specific record with this referee"
         },
         es: {
             darkMode: "Modo Oscuro",
@@ -84,7 +93,16 @@ document.addEventListener('DOMContentLoaded', () => {
             homeVsAway: "Sesgo Local vs Visitante",
             refVsTeam: "Estadísticas Árbitro vs Equipo",
             matchHistory: "Historial de Partidos",
-            logout: "Cerrar Sesión"
+            logout: "Cerrar Sesión",
+            noRefSelected: "Ningún Árbitro Seleccionado",
+            selectRefLoad: "Selecciona un árbitro para ver su perfil",
+            debutDate: "Fecha de Debut",
+            totalCacheMatches: "Partidos en Caché",
+            biasDesc: "Distribución calculada de tarjetas y penaltis entre local y visitante",
+            strongAwayBias: "SESGO VISITANTE",
+            balanced: "EQUILIBRADO",
+            strongHomeBias: "SESGO LOCAL",
+            selectTeamRecord: "Selecciona un equipo para ver su historial con este árbitro"
         },
         de: {
             darkMode: "Dunkelmodus",
@@ -113,7 +131,16 @@ document.addEventListener('DOMContentLoaded', () => {
             homeVsAway: "Heim vs Auswärts Tendenz",
             refVsTeam: "Schiedsrichter vs Team",
             matchHistory: "Spielverlauf",
-            logout: "Abmelden"
+            logout: "Abmelden",
+            noRefSelected: "Kein Schiedsrichter Ausgewählt",
+            selectRefLoad: "Schiedsrichter wählen um Profil zu laden",
+            debutDate: "Debütdatum",
+            totalCacheMatches: "Gesamte Spiele im Cache",
+            biasDesc: "Berechnete Karten- und Elfmeterverteilung zwischen Heim und Auswärts",
+            strongAwayBias: "STARK AUSWÄRTS",
+            balanced: "AUSGEGLICHEN",
+            strongHomeBias: "STARK HEIM",
+            selectTeamRecord: "Team wählen um spezifische Bilanz zu sehen"
         }
     };
 
