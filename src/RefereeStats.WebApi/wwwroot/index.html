@@ -93,7 +93,7 @@
                     </select>
                 </div>
                 <div class="control-box toggle-box">
-                    <label for="global-toggle" class="toggle-label" title="Cross-match statistics across all synced leagues for this referee">
+                    <label for="global-toggle" class="toggle-label" title="Cross-match statistics across all synced leagues for this referee" data-i18n="globalStatsMode">
                         Global Stats Mode
                     </label>
                     <label class="switch">
@@ -165,17 +165,17 @@
 
                 <!-- Matchup Preview Card -->
                 <div class="matchup-card glass-panel hidden" id="matchup-panel" style="margin-top: 1.5rem;">
-                    <h3>Matchup Strictness Preview</h3>
+                    <h3 data-i18n="matchupPreview">Matchup Strictness Preview</h3>
                     <div style="display: flex; gap: 0.5rem; margin-top: 1rem; margin-bottom: 1rem;">
                         <select id="home-team-input" class="matchup-input" style="flex: 1; width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--color-text-main);">
-                            <option value="">Home Team (Search...)</option>
+                            <option value="" data-i18n="homeTeamSearch">Home Team (Search...)</option>
                         </select>
                         <span style="align-self: center; font-weight: bold; color: var(--color-text-muted);">vs</span>
                         <select id="away-team-input" class="matchup-input" style="flex: 1; width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--color-text-main);">
-                            <option value="">Away Team (Search...)</option>
+                            <option value="" data-i18n="awayTeamSearch">Away Team (Search...)</option>
                         </select>
                     </div>
-                    <button id="predict-btn" class="btn-secondary" style="width: 100%;">Predict Advantage</button>
+                    <button id="predict-btn" class="btn-secondary" style="width: 100%;" data-i18n="predictAdvantage">Predict Advantage</button>
                     <div id="matchup-result" style="margin-top: 1rem; padding: 1rem; border-radius: 4px; background: var(--bg-base); display: none; text-align: center; font-weight: bold; border: 1px solid var(--border-color);"></div>
                 </div>
             </div>
@@ -203,19 +203,19 @@
 
                     <div class="bias-stats-grid">
                         <div class="bias-stat-box">
-                            <span class="bias-stat-name">Home Cards %</span>
+                            <span class="bias-stat-name" data-i18n="homeCardsPct">Home Cards %</span>
                             <span class="bias-stat-value" id="home-cards-pct">0%</span>
                         </div>
                         <div class="bias-stat-box">
-                            <span class="bias-stat-name">Away Cards %</span>
+                            <span class="bias-stat-name" data-i18n="awayCardsPct">Away Cards %</span>
                             <span class="bias-stat-value" id="away-cards-pct">0%</span>
                         </div>
                         <div class="bias-stat-box">
-                            <span class="bias-stat-name">Home Pen %</span>
+                            <span class="bias-stat-name" data-i18n="homePenPct">Home Pen %</span>
                             <span class="bias-stat-value" id="home-pen-pct">0%</span>
                         </div>
                         <div class="bias-stat-box">
-                            <span class="bias-stat-name">Away Pen %</span>
+                            <span class="bias-stat-name" data-i18n="awayPenPct">Away Pen %</span>
                             <span class="bias-stat-value" id="away-pen-pct">0%</span>
                         </div>
                     </div>
@@ -285,16 +285,16 @@
                         <table id="matches-table">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Home Team</th>
-                                    <th>Score</th>
-                                    <th>Away Team</th>
-                                    <th>Cards Issued</th>
+                                    <th data-i18n="thDate">Date</th>
+                                    <th data-i18n="thHomeTeam">Home Team</th>
+                                    <th data-i18n="thScore">Score</th>
+                                    <th data-i18n="thAwayTeam">Away Team</th>
+                                    <th data-i18n="thCards">Cards Issued</th>
                                 </tr>
                             </thead>
                             <tbody id="matches-tbody">
                                 <tr>
-                                    <td colspan="5" class="table-empty-state">Select a referee to view match history</td>
+                                    <td colspan="5" class="table-empty-state" data-i18n="selectRefMatchHistory">Select a referee to view match history</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -64,7 +64,25 @@ document.addEventListener('DOMContentLoaded', () => {
             strongAwayBias: "STRONG AWAY BIAS",
             balanced: "BALANCED",
             strongHomeBias: "STRONG HOME BIAS",
-            selectTeamRecord: "Select a team to see their specific record with this referee"
+            selectTeamRecord: "Select a team to see their specific record with this referee",
+            selectLeagueSeasonFirst: "Select a league & season first...",
+            globalStatsMode: "Global Stats Mode",
+            homeCardsPct: "Home Cards %",
+            awayCardsPct: "Away Cards %",
+            homePenPct: "Home Pen %",
+            awayPenPct: "Away Pen %",
+            selectTeam: "Select a team...",
+            homeTeamSearch: "Home Team (Search...)",
+            awayTeamSearch: "Away Team (Search...)",
+            matchupPreview: "Matchup Strictness Preview",
+            predictAdvantage: "Predict Advantage",
+            thDate: "Date",
+            thHomeTeam: "Home Team",
+            thScore: "Score",
+            thAwayTeam: "Away Team",
+            thCards: "Cards Issued",
+            matchesText: "Matches",
+            selectRefMatchHistory: "Select a referee to view match history"
         },
         es: {
             darkMode: "Modo Oscuro",
@@ -102,7 +120,25 @@ document.addEventListener('DOMContentLoaded', () => {
             strongAwayBias: "SESGO VISITANTE",
             balanced: "EQUILIBRADO",
             strongHomeBias: "SESGO LOCAL",
-            selectTeamRecord: "Selecciona un equipo para ver su historial con este árbitro"
+            selectTeamRecord: "Selecciona un equipo para ver su historial con este árbitro",
+            selectLeagueSeasonFirst: "Selecciona una liga y temporada...",
+            globalStatsMode: "Modo Estadísticas Globales",
+            homeCardsPct: "% Tarjetas Local",
+            awayCardsPct: "% Tarjetas Visit.",
+            homePenPct: "% Penaltis Local",
+            awayPenPct: "% Penaltis Visit.",
+            selectTeam: "Selecciona un equipo...",
+            homeTeamSearch: "Equipo Local (Buscar...)",
+            awayTeamSearch: "Equipo Visit. (Buscar...)",
+            matchupPreview: "Predicción de Enfrentamiento",
+            predictAdvantage: "Predecir Ventaja",
+            thDate: "Fecha",
+            thHomeTeam: "Equipo Local",
+            thScore: "Resultado",
+            thAwayTeam: "Equipo Visit.",
+            thCards: "Tarjetas",
+            matchesText: "Partidos",
+            selectRefMatchHistory: "Selecciona un árbitro para ver su historial"
         },
         de: {
             darkMode: "Dunkelmodus",
@@ -140,7 +176,25 @@ document.addEventListener('DOMContentLoaded', () => {
             strongAwayBias: "STARK AUSWÄRTS",
             balanced: "AUSGEGLICHEN",
             strongHomeBias: "STARK HEIM",
-            selectTeamRecord: "Team wählen um spezifische Bilanz zu sehen"
+            selectTeamRecord: "Team wählen um spezifische Bilanz zu sehen",
+            selectLeagueSeasonFirst: "Zuerst Liga & Saison wählen...",
+            globalStatsMode: "Globaler Statistikmodus",
+            homeCardsPct: "Heimkarten %",
+            awayCardsPct: "Auswärtskarten %",
+            homePenPct: "Heim-Elfm. %",
+            awayPenPct: "Auswärts-Elfm. %",
+            selectTeam: "Team wählen...",
+            homeTeamSearch: "Heimteam (Suchen...)",
+            awayTeamSearch: "Auswärtsteam (Suchen...)",
+            matchupPreview: "Matchup-Vorschau",
+            predictAdvantage: "Vorteil Vorhersagen",
+            thDate: "Datum",
+            thHomeTeam: "Heimteam",
+            thScore: "Ergebnis",
+            thAwayTeam: "Auswärtsteam",
+            thCards: "Karten Gegeben",
+            matchesText: "Spiele",
+            selectRefMatchHistory: "Schiedsrichter wählen um Spielverlauf zu sehen"
         }
     };
 
@@ -161,8 +215,29 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Re-load labels dependent on JS state
         if (refereeSelect.disabled) {
-            refereeSelect.innerHTML = `<option value="">${t('loadingReferees')}</option>`;
+            refereeSelect.innerHTML = `<option value="">${t('selectLeagueSeasonFirst')}</option>`;
         }
+        
+        // Also update the selectTeam dropdowns if they are in their default state
+        const tsSelect = document.getElementById('team-stats-select');
+        if (tsSelect && tsSelect.options.length === 1 && tsSelect.options[0].value === "") {
+            tsSelect.innerHTML = `<option value="">${t('selectTeam')}</option>`;
+        }
+        const htInput = document.getElementById('home-team-input');
+        if (htInput && htInput.options.length === 1 && htInput.options[0].value === "") {
+            htInput.innerHTML = `<option value="">${t('homeTeamSearch')}</option>`;
+        }
+        const atInput = document.getElementById('away-team-input');
+        if (atInput && atInput.options.length === 1 && atInput.options[0].value === "") {
+            atInput.innerHTML = `<option value="">${t('awayTeamSearch')}</option>`;
+        }
+        
+        const mCount = document.getElementById('matches-count');
+        if (mCount) {
+            const count = parseInt(mCount.textContent) || 0;
+            mCount.textContent = `${count} ${t('matchesText')}`;
+        }
+
         document.getElementById('sync-button').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> ${t('syncLeague')}`;
         document.getElementById('leaderboard-button').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8M6 20V4M18 20v-4"/></svg> ${t('leaderboard')}`;
         
@@ -412,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch Matches Table
     async function fetchMatches(refereeId, league, season, isGlobal) {
-        matchesTbody.innerHTML = '<tr><td colspan="5" class="table-empty-state">Loading matches...</td></tr>';
+        matchesTbody.innerHTML = `<tr><td colspan="5" class="table-empty-state">${t('loadingMatches')}</td></tr>`;
         
         try {
             const res = await fetch(`/api/referees/${refereeId}/matches?league=${league}&season=${season}&global=${isGlobal}`);
@@ -420,11 +495,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const payload = await res.json();
             const matches = payload.content || [];
-            matchesCount.textContent = `${matches.length} Matches`;
+            matchesCount.textContent = `${matches.length} ${t('matchesText')}`;
             refTotalMatches.textContent = matches.length;
 
             if (matches.length === 0) {
-                matchesTbody.innerHTML = '<tr><td colspan="5" class="table-empty-state">No match reports in cache for this referee in this league/season.</td></tr>';
+                matchesTbody.innerHTML = `<tr><td colspan="5" class="table-empty-state">${t('noMatches')}</td></tr>`;
                 return;
             }
 
@@ -460,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (err) {
             console.error(err);
-            matchesTbody.innerHTML = '<tr><td colspan="5" class="table-empty-state">Error loading match reports.</td></tr>';
+            matchesTbody.innerHTML = `<tr><td colspan="5" class="table-empty-state">${t('errorMatches')}</td></tr>`;
         }
     }
 
