@@ -35,26 +35,26 @@ Swagger UI at `https://localhost:<port>/swagger` (Development environment only).
 
 Endpoints:
 
-- `GET /api/referees/{refereeId}/profile?league={league}&season={season}` — Level 1
-- `GET /api/referees/{refereeId}/matches?since={date}` — Level 2
-- `GET /api/referees/{refereeId}/analytics` — Level 3
-- `GET /api/leagues/{league}/referees?season={season}` — referee list
+- `GET /api/v1/referees/{refereeId}/profile?league={league}&season={season}` — Level 1 (Profiles)
+- `GET /api/v1/referees/{refereeId}/matches?league={league}&season={season}&since={date}` — Level 2 (Matches)
+- `GET /api/v1/referees/{refereeId}/analytics` — Level 3 (Advanced stats & Win ratios)
+- `GET /api/v1/leagues/{league}/referees?season={season}` — Referee List
 
 **Premium Value-Add Endpoints:**
-- `GET /api/analytics/leagues/{league}/leaderboard?season={season}&sortBy={strictness|homeBias}` — Ranks referees in a league by strictness or home bias.
-- `GET /api/analytics/matchup-preview?refereeId={id}&homeTeam={home}&awayTeam={away}&league={league}&season={season}` — Generates an insight on which team is historically favored by this referee.
-- `GET /api/analytics/compare?refereeAId={idA}&refereeBId={idB}&league={league}&season={season}` — Head-to-head referee comparison.
-- `GET /api/referees/{refereeId}/analytics` — (Updated) Now includes `refereeTeamHistory` with granular Wins, Draws, Losses, Goals, and Penalties for every team officiated.
+- `GET /api/v1/analytics/leagues/{league}/leaderboard?season={season}&sortBy={strictness|matches}` — Ranks referees in a league by strictness or matches.
+- `GET /api/v1/analytics/matchup-preview?refereeId={id}&homeTeam={home}&awayTeam={away}&league={league}&season={season}` — Generates an insight on which team is historically favored by this referee.
+- `GET /api/v1/analytics/compare?refereeAId={idA}&refereeBId={idB}&league={league}&season={season}` — Head-to-head referee comparison.
 
-### RapidAPI Authentication
+### Authentication & Security
 
-RapidAPI injects the `X-RapidAPI-Proxy-Secret` header on every request forwarded to your
-backend. `RapidApiProxySecretMiddleware` validates it against `RapidApi:ProxySecret`
-(appsettings or env var `RapidApi__ProxySecret`). If no secret is configured, validation
-is skipped (useful for local/dev).
+The WebApi uses a dual authentication system configured via ASP.NET Core:
 
-Rate limiting via `AspNetCoreRateLimit` (see `IpRateLimiting` section in
-`appsettings.json`) — independent of RapidAPI's rate limiting.
+1. **RapidAPI Proxy Secret (B2B):** Verified via the `RapidApiAuthHandler`. It checks for the `X-RapidAPI-Proxy-Secret` header against the `RapidApi:ProxySecret` config variable.
+2. **Dashboard JWT (B2C):** Verified via standard JWT Bearer tokens. Used to log in securely to the Dashboard frontend.
+
+All API routes require authentication unless marked with `[AllowAnonymous]` (e.g., `/api/v1/auth/login` and `/health`).
+
+Rate limiting is handled via `AspNetCoreRateLimit` (independent of RapidAPI).
 
 ## Docker Build (Apify Actor)
 
@@ -114,18 +114,17 @@ secrets in your GitHub repo:
 | `HF_DATASET_REPO` | `username/dataset-name` on HuggingFace |
 | `GITHUB_TOKEN` | Auto-provided by Actions — creates Release |
 
-## Deploy WebApi (Azure App Service)
+## Deploy WebApi (Railway)
 
-```bash
-az webapp up \
-  --name referee-stats-api \
-  --resource-group <rg> \
-  --runtime "DOTNETCORE:8.0" \
-  --sku B1
-```
+The API is packaged with a `Dockerfile` and `railway.toml` for easy deploy on Railway:
 
-Set `RapidApi__ProxySecret` as App Setting in Azure with the secret RapidAPI uses
-for your API in its backend configuration panel.
+1. Connect your repository to Railway.
+2. Add a persistent **Volume** and mount it under `/app/data/cache`.
+3. Set the environment variables:
+   - `ASPNETCORE_ENVIRONMENT`: `Production`
+   - `RapidApi:ProxySecret`: Your RapidAPI secret key (for proxy protection)
+   - `Jwt:Key`: A strong security key for generating dashboard session tokens.
+   - `DefaultAdminPassword`: Set a master password (defaults to `admin123_ChangeMe!`).
 
 ## Error Categorization
 
