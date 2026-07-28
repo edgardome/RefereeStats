@@ -4,99 +4,258 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - RefereeStats Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            background-color: var(--bg-primary);
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, #1f2937, #0f172a);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
         }
-        .login-container {
-            background-color: var(--bg-secondary);
-            padding: 2.5rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-lg);
+
+        /* Background glows */
+        .glow-1 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -200px;
+            right: -200px;
+            z-index: 0;
+            border-radius: 50%;
+        }
+        .glow-2 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(236,72,153,0.1) 0%, rgba(0,0,0,0) 70%);
+            bottom: -100px;
+            left: -100px;
+            z-index: 0;
+            border-radius: 50%;
+        }
+
+        .login-wrapper {
+            position: relative;
+            z-index: 10;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            padding: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
-        .login-container h1 {
-            margin-bottom: 0.5rem;
-            color: var(--color-text);
+
+        /* Logo handling */
+        .logo-container {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 1.5rem;
+            background-color: #ffffff; /* White background to match the logo */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255,255,255,0.2);
         }
-        .login-container p {
-            color: var(--color-text-muted);
+        
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Using mix-blend-mode inside the white container if needed, but standard rendering is fine since container is white */
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(to right, #fff, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: #94a3b8;
+            font-size: 0.95rem;
             margin-bottom: 2rem;
-            font-size: 0.9rem;
         }
-        .input-group {
+
+        #premium-notice {
+            display: none;
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: #fde047;
+            padding: 0.75rem;
+            border-radius: 8px;
             margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
             text-align: left;
         }
+
         .input-group label {
             display: block;
             margin-bottom: 0.5rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            color: var(--color-text);
+            color: #cbd5e1;
         }
+
         .input-group input {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            background-color: var(--bg-primary);
-            color: var(--color-text);
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-sizing: border-box;
         }
+
         .input-group input:focus {
             outline: none;
-            border-color: var(--accent-primary);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            background: rgba(15, 23, 42, 0.8);
         }
+
         .login-btn {
             width: 100%;
-            padding: 0.75rem;
-            background-color: var(--accent-primary);
-            color: white;
+            padding: 0.875rem;
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            color: #fff;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: 8px;
             font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 0.5rem;
         }
+
         .login-btn:hover {
-            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5);
         }
+
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+
         #login-error {
-            color: var(--color-red);
+            color: #ef4444;
             font-size: 0.85rem;
             margin-top: 1rem;
             display: none;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .freemium-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .freemium-link:hover {
+            color: #fff;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>RefereeStats</h1>
-        <p>Sign in to access the Premium Dashboard</p>
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
 
-        <form id="login-form">
-            <div class="input-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" required placeholder="admin@refereestats.com">
+    <div class="login-wrapper">
+        <div class="glass-panel">
+            <div class="logo-container">
+                <img src="logo.png" alt="Referee Stats Logo" onerror="this.style.display='none'">
             </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter password">
-            </div>
-            <button type="submit" class="login-btn">Sign In</button>
-            <div id="login-error"></div>
-        </form>
+            
+            <h1>RefereeStats PRO</h1>
+            <p id="login-subtitle">Sign in to access Premium Analytics</p>
+            
+            <div id="premium-notice">⭐️ Premium Feature. Please sign in to access this league.</div>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="admin@refereestats.com">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="login-btn">Sign In</button>
+                <div id="login-error"></div>
+            </form>
+            
+            <a href="/index.html" class="freemium-link">← Continue with Free Version (LaLiga 2)</a>
+        </div>
     </div>
 
     <script>
+        // Basic i18n detection
+        const userLang = navigator.language || navigator.userLanguage; 
+        const isSpanish = userLang.startsWith('es');
+        const isGerman = userLang.startsWith('de');
+
+        if (isSpanish) {
+            document.getElementById('login-subtitle').textContent = "Inicia sesión para Estadísticas Premium";
+            document.querySelector('label[for="email"]').textContent = "Correo Electrónico";
+            document.querySelector('label[for="password"]').textContent = "Contraseña";
+            document.querySelector('.login-btn').textContent = "Ingresar";
+            document.querySelector('.freemium-link').textContent = "← Continuar con Versión Gratuita (LaLiga 2)";
+        } else if (isGerman) {
+            document.getElementById('login-subtitle').textContent = "Melden Sie sich an für Premium Statistiken";
+            document.querySelector('label[for="email"]').textContent = "E-Mail";
+            document.querySelector('label[for="password"]').textContent = "Passwort";
+            document.querySelector('.login-btn').textContent = "Anmelden";
+            document.querySelector('.freemium-link').textContent = "← Weiter mit der kostenlosen Version (LaLiga 2)";
+        }
+
+        // Check if redirected because of premium access
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('premium') === 'true') {
+            const notice = document.getElementById('premium-notice');
+            notice.style.display = 'block';
+            if (isSpanish) notice.textContent = '⭐️ Función Premium. Inicia sesión para acceder a esta liga.';
+            if (isGerman) notice.textContent = '⭐️ Premium-Funktion. Bitte melden Sie sich an, um auf diese Liga zuzugreifen.';
+        }
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -104,7 +263,7 @@
             const errorDiv = document.getElementById('login-error');
             const btn = document.querySelector('.login-btn');
 
-            btn.textContent = 'Signing in...';
+            btn.textContent = isSpanish ? 'Iniciando...' : (isGerman ? 'Anmelden...' : 'Signing in...');
             errorDiv.style.display = 'none';
 
             try {
@@ -120,11 +279,12 @@
 
                 const data = await res.json();
                 sessionStorage.setItem('jwt_token', data.token);
+                // Return to dashboard without query params
                 window.location.href = '/index.html';
             } catch (err) {
-                errorDiv.textContent = 'Invalid email or password.';
+                errorDiv.textContent = isSpanish ? 'Correo o contraseña incorrectos.' : (isGerman ? 'Ungültige E-Mail oder Passwort.' : 'Invalid email or password.');
                 errorDiv.style.display = 'block';
-                btn.textContent = 'Sign In';
+                btn.textContent = isSpanish ? 'Ingresar' : (isGerman ? 'Anmelden' : 'Sign In');
             }
         });
     </script>

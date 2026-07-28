@@ -4,12 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RefereeStats Dashboard — Premium Analytics</title>
-    <script>
-        const token = sessionStorage.getItem('jwt_token');
-        if (!token) {
-            window.location.href = '/login.html';
-        }
-    </script>
+    <!-- Auth check removed for Freemium model -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -33,9 +28,17 @@
             </div>
             
             <div class="header-actions">
-                <!-- Theme Toggle -->
-                <div class="toggle-box" title="Toggle Light/Dark Theme">
-                    <span class="toggle-label">Dark Mode</span>
+                <div class="header-controls">
+                    <!-- Language Selector -->
+                    <select id="lang-select" class="lang-selector">
+                        <option value="en" selected>English</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+
+                    <!-- Theme Toggle -->
+                    <div class="toggle-box" title="Toggle Light/Dark Theme">
+                        <span class="toggle-label" data-i18n="darkMode">Dark Mode</span>
                     <label class="switch">
                         <input type="checkbox" id="theme-toggle">
                         <span class="slider round"></span>

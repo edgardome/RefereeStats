@@ -13,7 +13,7 @@ window.fetch = async function () {
     const response = await originalFetch(resource, config);
     if (response.status === 401) {
         sessionStorage.removeItem('jwt_token');
-        window.location.href = '/login.html';
+        window.location.href = '/login.html?premium=true';
     }
     return response;
 };
@@ -24,6 +24,109 @@ document.addEventListener('DOMContentLoaded', () => {
     const refereeSelect = document.getElementById('referee-select');
     const syncButton = document.getElementById('sync-button');
     const toast = document.getElementById('toast');
+    const langSelect = document.getElementById('lang-select');
+
+    // i18n Dictionary
+    const translations = {
+        en: {
+            darkMode: "Dark Mode",
+            leaderboard: "Leaderboard",
+            syncLeague: "Sync League",
+            loadingReferees: "Loading referees...",
+            noReferees: "No referees found for this season.",
+            selectReferee: "Select a referee...",
+            errorLoadingRefs: "⚠️ Error loading referees from server.",
+            overallAverages: "Overall Averages",
+            yellowCards: "Yellow Cards",
+            secondYellows: "2nd Yellows",
+            directReds: "Direct Reds",
+            penalties: "Penalties",
+            homeLeaning: "Home Leaning",
+            awayLeaning: "Away Leaning",
+            neutral: "Neutral",
+            loadingMatches: "Loading matches...",
+            noMatches: "No match reports in cache for this referee in this league/season.",
+            errorMatches: "Error loading match reports.",
+            syncing: "Syncing...",
+            syncComplete: "Sync Complete"
+        },
+        es: {
+            darkMode: "Modo Oscuro",
+            leaderboard: "Clasificación",
+            syncLeague: "Sincronizar Liga",
+            loadingReferees: "Cargando árbitros...",
+            noReferees: "No se encontraron árbitros para esta temporada.",
+            selectReferee: "Selecciona un árbitro...",
+            errorLoadingRefs: "⚠️ Error cargando árbitros del servidor.",
+            overallAverages: "Promedios Generales",
+            yellowCards: "Tarjetas Amarillas",
+            secondYellows: "Dobles Amarillas",
+            directReds: "Rojas Directas",
+            penalties: "Penaltis",
+            homeLeaning: "Tendencia Local",
+            awayLeaning: "Tendencia Visitante",
+            neutral: "Neutral",
+            loadingMatches: "Cargando partidos...",
+            noMatches: "No hay partidos en caché para este árbitro en esta liga/temporada.",
+            errorMatches: "Error al cargar los partidos.",
+            syncing: "Sincronizando...",
+            syncComplete: "Sincronización Completa"
+        },
+        de: {
+            darkMode: "Dunkelmodus",
+            leaderboard: "Rangliste",
+            syncLeague: "Liga Synchronisieren",
+            loadingReferees: "Schiedsrichter werden geladen...",
+            noReferees: "Keine Schiedsrichter für diese Saison gefunden.",
+            selectReferee: "Wähle einen Schiedsrichter...",
+            errorLoadingRefs: "⚠️ Fehler beim Laden der Schiedsrichter.",
+            overallAverages: "Gesamtdurchschnitt",
+            yellowCards: "Gelbe Karten",
+            secondYellows: "Gelb-Rote Karten",
+            directReds: "Rote Karten",
+            penalties: "Elfmeter",
+            homeLeaning: "Heim-Tendenz",
+            awayLeaning: "Auswärts-Tendenz",
+            neutral: "Neutral",
+            loadingMatches: "Spiele werden geladen...",
+            noMatches: "Keine Spiele im Cache für diesen Schiedsrichter gefunden.",
+            errorMatches: "Fehler beim Laden der Spiele.",
+            syncing: "Wird synchronisiert...",
+            syncComplete: "Synchronisation Abgeschlossen"
+        }
+    };
+
+    let currentLang = 'en';
+
+    function t(key) {
+        return translations[currentLang][key] || key;
+    }
+
+    function updateLanguage() {
+        currentLang = langSelect.value;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[currentLang][key]) {
+                el.textContent = translations[currentLang][key];
+            }
+        });
+        
+        // Re-load labels dependent on JS state
+        if (refereeSelect.disabled) {
+            refereeSelect.innerHTML = `<option value="">${t('loadingReferees')}</option>`;
+        }
+        document.getElementById('sync-button').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> ${t('syncLeague')}`;
+        document.getElementById('leaderboard-button').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8M6 20V4M18 20v-4"/></svg> ${t('leaderboard')}`;
+        
+        // Force reload of texts
+        if(refereeSelect.value) {
+            handleRefereeChange();
+        } else {
+            loadReferees();
+        }
+    }
+
+    langSelect.addEventListener('change', updateLanguage);
 
     // Stats Panel Elements
     const refCard = document.getElementById('referee-card');

@@ -16,7 +16,11 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-builder.Services.AddControllers(options => options.Filters.Add<ScrapeExceptionFilter>());
+builder.Services.AddControllers(options => 
+{
+    options.Filters.Add<ScrapeExceptionFilter>();
+    options.Filters.Add<RefereeStats.WebApi.Filters.FreemiumLeagueFilterAttribute>();
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -59,7 +63,7 @@ builder.Services.AddAuthorization(options =>
         .Build();
     
     options.DefaultPolicy = defaultPolicy;
-    options.FallbackPolicy = defaultPolicy; // Global protection by default
+    // FallbackPolicy is removed so FreemiumLeagueFilter can manage selective access
 });
 builder.Services.AddHostedService<MatchSyncBackgroundService>();
 

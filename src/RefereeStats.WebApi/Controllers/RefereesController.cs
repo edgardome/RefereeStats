@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RefereeStats.Core.Models;
 using RefereeStats.Core.Scraping;
+using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -122,6 +123,7 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
     /// <summary>Synchronizes all granular match reports for a given league and season into the local reverse index (incremental).</summary>
     [HttpPost("leagues/{league}/sync-matches")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize]
     public async Task<ActionResult> SyncLeagueMatches(string league, [FromQuery] string season, [FromQuery] int? limit, CancellationToken ct)
     {
         var (countSynced, totalCount) = await MatchCacheService.SyncLeagueIncrementalAsync(league, season, limit, scraper, ct);
@@ -194,6 +196,7 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
     /// <summary>Synchronizes all supported leagues from configuration (incremental).</summary>
     [HttpPost("leagues/sync-all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize]
     public async Task<ActionResult> SyncAllLeagues([FromQuery] int? limitPerLeague, CancellationToken ct)
     {
         var section = configuration.GetSection("SyncSettings");
