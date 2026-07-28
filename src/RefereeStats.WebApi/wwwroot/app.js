@@ -66,7 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/api/leagues/${league}/referees?season=${season}`);
             if (!res.ok) throw new Error('Failed to load referees');
             
-            const referees = await res.json();
+            const payload = await res.json();
+            const referees = payload.content || [];
             
             if (referees.length === 0) {
                 refereeSelect.innerHTML = '<option value="">No referees found for this season.</option>';
@@ -229,7 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/api/referees/${refereeId}/matches?league=${league}&season=${season}&global=${isGlobal}`);
             if (!res.ok) throw new Error('Failed to fetch matches');
 
-            const matches = await res.json();
+            const payload = await res.json();
+            const matches = payload.content || [];
             matchesCount.textContent = `${matches.length} Matches`;
             refTotalMatches.textContent = matches.length;
 
@@ -353,7 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const res = await fetch(`/api/analytics/leagues/${league}/leaderboard?season=${season}&sortBy=${sortBy}`);
-            const data = await res.json();
+            const payload = await res.json();
+            const data = payload.content || [];
             
             leaderboardTbody.innerHTML = '';
             data.forEach(ref => {

@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.IO.Compression;
 using RefereeStats.Core.Models;
 using RefereeStats.Core.Scraping;
 
@@ -219,42 +217,5 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
         }
 
         return Ok(results);
-    }
-
-    /// <summary>Endpoint temporal para subir los archivos JSON de caché en un ZIP.</summary>
-    [HttpPost("system/upload-cache")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UploadCacheZip(IFormFile file, CancellationToken ct)
-    {
-        if (file == null || file.Length == 0)
-            return BadRequest("File is empty.");
-
-        if (!file.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-            return BadRequest("Only .zip files are allowed.");
-
-        var cacheDir = Path.Combine(AppContext.BaseDirectory, "data", "cache");
-        Directory.CreateDirectory(cacheDir);
-
-        var tempFilePath = Path.GetTempFileName();
-        try
-        {
-            using (var stream = new FileStream(tempFilePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream, ct);
-            }
-
-            ZipFile.ExtractToDirectory(tempFilePath, cacheDir, overwriteFiles: true);
-
-            var filesExtracted = Directory.GetFiles(cacheDir).Length;
-            return Ok(new { Message = "Cache successfully populated from ZIP", TotalFiles = filesExtracted });
-        }
-        finally
-        {
-            if (System.IO.File.Exists(tempFilePath))
-            {
-                System.IO.File.Delete(tempFilePath);
-            }
-        }
     }
 }
