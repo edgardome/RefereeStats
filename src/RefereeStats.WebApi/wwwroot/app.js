@@ -19,7 +19,8 @@ window.fetch = async (resource, config) => {
     const response = await originalFetch(resource, config);
     if (response.status === 401) {
         sessionStorage.removeItem('jwt_token');
-        showPremiumModal();
+        const modal = document.getElementById('premium-modal');
+        if (modal) modal.classList.remove('hidden');
         return Promise.reject('Unauthorized - Premium Required');
     }
     return response;
@@ -293,6 +294,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
             sessionStorage.removeItem('jwt_token');
+            if (leagueSelect) {
+                leagueSelect.value = 'laliga2';
+            }
             window.location.href = '/index.html';
         });
     }
