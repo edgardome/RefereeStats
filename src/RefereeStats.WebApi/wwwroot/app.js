@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             valueField: 'value',
             searchField: ['text'],
             sortField: { field: "text", direction: "asc" },
-            controlInput: '<input type="text" autocomplete="new-password" data-lpignore="true" spellcheck="false">',
+            controlInput: '<input type="text" autocomplete="off" readonly onfocus="this.removeAttribute(\'readonly\');" data-lpignore="true" spellcheck="false">',
             onChange: loadReferees
         });
         
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.tsCountry = new TomSelect(countrySelect, {
             create: false,
             sortField: { field: "text", direction: "asc" },
-            controlInput: '<input type="text" autocomplete="new-password" data-lpignore="true" spellcheck="false">'
+            controlInput: '<input type="text" autocomplete="off" readonly onfocus="this.removeAttribute(\'readonly\');" data-lpignore="true" spellcheck="false">'
         });
         
         window.tsCountry.on('change', (val) => {

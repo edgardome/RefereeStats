@@ -109,6 +109,8 @@ public sealed class AuthService
 
     public void DowngradeUser(string stripeCustomerId, string email)
     {
+        _logger.LogInformation("Attempting to downgrade user. StripeCustomerId: {StripeCustomerId}, Email: {Email}", stripeCustomerId, email);
+        
         var users = LoadUsers();
         var user = users.FirstOrDefault(u => 
             (!string.IsNullOrEmpty(stripeCustomerId) && u.StripeCustomerId == stripeCustomerId) || 
@@ -116,9 +118,15 @@ public sealed class AuthService
             
         if (user != null)
         {
+            _logger.LogInformation("User found: {UserEmail}. Current Premium status: {IsPremium}. Downgrading...", user.Email, user.IsPremium);
             user.IsPremium = false;
             user.StripeCustomerId = null;
             SaveUsers(users);
+            _logger.LogInformation("User {UserEmail} successfully downgraded.", user.Email);
+        }
+        else
+        {
+            _logger.LogWarning("Could not find user to downgrade! Check if the email or stripeCustomerId matches an existing user.");
         }
     }
 
