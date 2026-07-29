@@ -18,7 +18,17 @@ window.fetch = async (resource, config) => {
 
     const response = await originalFetch(resource, config);
     if (response.status === 401) {
-        sessionStorage.removeItem('jwt_token');
+        if (sessionStorage.getItem('jwt_token')) {
+            sessionStorage.removeItem('jwt_token');
+            window.location.reload();
+        } else {
+            // Already logged out, just show the auth modal or premium modal
+            const premiumModal = document.getElementById('premium-modal');
+            if (premiumModal) premiumModal.classList.remove('hidden');
+        }
+        return Promise.reject('Unauthorized - Token Expired or Missing');
+    }
+    if (response.status === 403 || response.status === 402) {
         const modal = document.getElementById('premium-modal');
         if (modal) modal.classList.remove('hidden');
         return Promise.reject('Unauthorized - Premium Required');
@@ -26,7 +36,22 @@ window.fetch = async (resource, config) => {
     return response;
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Handle Stripe payment success redirect
+    const topUrlParams = new URLSearchParams(window.location.search);
+    if (topUrlParams.get('payment') === 'success') {
+        const token = sessionStorage.getItem('jwt_token');
+        if (token) {
+            try {
+                const res = await fetch('/api/v1/auth/refresh', { method: 'POST' });
+                if (res.ok) {
+                    const data = await res.json();
+                    sessionStorage.setItem('jwt_token', data.token);
+                }
+            } catch (e) { console.error('Failed to refresh token after payment', e); }
+        }
+    }
+
     const leagueSelect = document.getElementById('league-select');
     
     // Build the options data from the original select BEFORE TomSelect touches it
@@ -156,7 +181,20 @@ document.addEventListener('DOMContentLoaded', () => {
             subscribeBtn: "Upgrade Now",
             orText: "OR",
             alreadyHaveAccount: "I already have an account",
-            loginBtn: "Login / PRO"
+            loginBtn: "Login / PRO",
+            invalidEmail: "Please enter a valid email address.",
+            emailPlaceholder: "Your Email",
+            passwordPlaceholder: "Choose a Password",
+            createAccountBtn: "Create Account & Pay",
+            profileBtn: "My Profile",
+            profileTitle: "My Profile",
+            changeEmailLabel: "Change Email",
+            updateEmailBtn: "Update Email",
+            changePasswordLabel: "Change Password",
+            updatePasswordBtn: "Update Password",
+            subscriptionLabel: "Subscription",
+            manageSubBtn: "Manage Subscription",
+            noSubText: "No active subscription"
         },
         es: {
             darkMode: "Modo Oscuro",
@@ -218,7 +256,20 @@ document.addEventListener('DOMContentLoaded', () => {
             subscribeBtn: "Mejorar Ahora",
             orText: "O",
             alreadyHaveAccount: "Ya tengo una cuenta",
-            loginBtn: "Login / PRO"
+            loginBtn: "Login / PRO",
+            invalidEmail: "Por favor, introduce un correo válido.",
+            emailPlaceholder: "Tu Correo Electrónico",
+            passwordPlaceholder: "Elige una Contraseña",
+            createAccountBtn: "Crear Cuenta y Pagar",
+            profileBtn: "Mi Perfil",
+            profileTitle: "Mi Perfil",
+            changeEmailLabel: "Cambiar Correo",
+            updateEmailBtn: "Actualizar Correo",
+            changePasswordLabel: "Cambiar Contraseña",
+            updatePasswordBtn: "Actualizar Contraseña",
+            subscriptionLabel: "Suscripción",
+            manageSubBtn: "Gestionar Suscripción",
+            noSubText: "Sin suscripción activa"
         },
         de: {
             darkMode: "Dunkelmodus",
@@ -280,7 +331,20 @@ document.addEventListener('DOMContentLoaded', () => {
             subscribeBtn: "Jetzt Upgraden",
             orText: "ODER",
             alreadyHaveAccount: "Ich habe bereits ein Konto",
-            loginBtn: "Login / PRO"
+            loginBtn: "Login / PRO",
+            invalidEmail: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+            emailPlaceholder: "Ihre E-Mail",
+            passwordPlaceholder: "Passwort wählen",
+            createAccountBtn: "Konto erstellen & bezahlen",
+            profileBtn: "Mein Profil",
+            profileTitle: "Mein Profil",
+            changeEmailLabel: "E-Mail ändern",
+            updateEmailBtn: "E-Mail aktualisieren",
+            changePasswordLabel: "Passwort ändern",
+            updatePasswordBtn: "Passwort aktualisieren",
+            subscriptionLabel: "Abonnement",
+            manageSubBtn: "Abonnement verwalten",
+            noSubText: "Kein aktives Abonnement"
         }
     };
 
@@ -299,6 +363,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.textContent = translations[currentLang][key];
                 }
             });
+            
+            // Update modal placeholders and buttons
+            const ctaEmail = document.getElementById('cta-email');
+            const ctaPassword = document.getElementById('cta-password');
+            const btnSubmitSignup = document.getElementById('btn-submit-signup');
+            const newEmailInput = document.getElementById('new-email-input');
+            const newPasswordInput = document.getElementById('new-password-input');
+            
+            if (ctaEmail) ctaEmail.placeholder = t('emailPlaceholder');
+            if (ctaPassword) ctaPassword.placeholder = t('passwordPlaceholder');
+            if (btnSubmitSignup) btnSubmitSignup.textContent = t('createAccountBtn');
+            if (newEmailInput) newEmailInput.placeholder = t('emailPlaceholder');
+            if (newPasswordInput) newPasswordInput.placeholder = t('passwordPlaceholder');
             
             // Re-load labels dependent on JS state
             if (refereeSelect.disabled) {
@@ -342,17 +419,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnLogout = document.getElementById('logout-btn');
     const authLoginBtn = document.getElementById('auth-login-btn');
+    const profileBtn = document.getElementById('profile-btn');
     
     console.log("Auth Check:", sessionStorage.getItem('jwt_token') ? "LOGGED IN" : "NOT LOGGED IN");
     
     if (sessionStorage.getItem('jwt_token')) {
         if (btnLogout) {
             btnLogout.style.setProperty('display', 'flex', 'important');
-            console.log("Logout button set to visible");
+        }
+        if (profileBtn) {
+            profileBtn.style.setProperty('display', 'inline-block', 'important');
         }
         if (authLoginBtn) authLoginBtn.style.setProperty('display', 'none', 'important');
     } else {
         if (btnLogout) btnLogout.style.setProperty('display', 'none', 'important');
+        if (profileBtn) profileBtn.style.setProperty('display', 'none', 'important');
         if (authLoginBtn) authLoginBtn.style.setProperty('display', 'block', 'important');
     }
 
@@ -360,9 +441,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLogout.addEventListener('click', () => {
             sessionStorage.removeItem('jwt_token');
             if (leagueSelect) {
-                leagueSelect.value = 'laliga2';
+                leagueSelect.value = 'ES2'; // Use the correct ID for the free league
             }
-            window.location.href = '/index.html';
+            window.location.reload();
         });
     }
     
@@ -372,6 +453,97 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Profile Modal Logic
+    const profileModal = document.getElementById('profile-modal');
+    if (profileBtn && profileModal) {
+        profileBtn.addEventListener('click', () => {
+            profileModal.classList.remove('hidden');
+            
+            // Check if user is premium to show portal button
+            const token = sessionStorage.getItem('jwt_token');
+            if (token) {
+                try {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    const payload = JSON.parse(jsonPayload);
+                    
+                    if (payload.is_premium === "true" || payload.is_premium === true) {
+                        document.getElementById('btn-manage-subscription').style.display = 'block';
+                        document.getElementById('no-sub-text').style.display = 'none';
+                    }
+                } catch(e) {
+                    console.error('Failed to parse JWT', e);
+                }
+            }
+        });
+        
+        document.querySelector('.close-profile-modal')?.addEventListener('click', () => {
+            profileModal.classList.add('hidden');
+        });
+    }
+
+    // Change Email
+    document.getElementById('btn-change-email')?.addEventListener('click', async () => {
+        const newEmail = document.getElementById('new-email-input').value;
+        const errLabel = document.getElementById('email-error');
+        if (!newEmail) return;
+        
+        try {
+            const res = await fetch('/api/v1/auth/change-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ newEmail })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                sessionStorage.setItem('jwt_token', data.token);
+                showToast('Email updated successfully', 3000);
+                errLabel.style.display = 'none';
+            } else {
+                errLabel.textContent = 'Failed to update email. Maybe in use.';
+                errLabel.style.display = 'block';
+            }
+        } catch(e) {}
+    });
+
+    // Change Password
+    document.getElementById('btn-change-password')?.addEventListener('click', async () => {
+        const newPassword = document.getElementById('new-password-input').value;
+        const errLabel = document.getElementById('password-error');
+        if (!newPassword) return;
+        
+        try {
+            const res = await fetch('/api/v1/auth/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ newPassword })
+            });
+            if (res.ok) {
+                showToast('Password updated successfully', 3000);
+                errLabel.style.display = 'none';
+            } else {
+                errLabel.textContent = 'Failed to update password.';
+                errLabel.style.display = 'block';
+            }
+        } catch(e) {}
+    });
+
+    // Customer Portal
+    document.getElementById('btn-manage-subscription')?.addEventListener('click', async () => {
+        try {
+            const res = await fetch('/api/v1/payments/portal', { method: 'POST' });
+            if (res.ok) {
+                const data = await res.json();
+                window.location.href = data.url;
+            } else {
+                showToast('Failed to open billing portal', 3000);
+            }
+        } catch(e) {}
+    });
+
     // Check if user just paid
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('payment') === 'success' || urlParams.get('payment') === 'mock_success') {
@@ -411,7 +583,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const errLabel = document.getElementById('cta-error');
         
         if (!email || !password) {
-            errLabel.textContent = 'Please enter email and password';
+            errLabel.textContent = t('invalidEmail'); // Fallback logic
+            errLabel.style.display = 'block';
+            return;
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            errLabel.textContent = t('invalidEmail');
             errLabel.style.display = 'block';
             return;
         }

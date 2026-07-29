@@ -8,8 +8,22 @@ namespace RefereeStats.WebApi.Controllers;
 [ApiController]
 [Route("api/v1/analytics")]
 [Route("api/analytics")] // backward-compatible
-public sealed class AnalyticsController() : ControllerBase
+public sealed class AnalyticsController(AuthService authService) : ControllerBase
 {
+    private bool IsPremium()
+    {
+        if (User.Identity?.IsAuthenticated != true) return false;
+
+        // Verify live status in database instead of trusting a potentially expired token claim
+        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+                 ?? User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+        
+        if (string.IsNullOrEmpty(email)) return false;
+
+        var user = authService.GetUserByEmail(email);
+        return user?.IsPremium == true;
+    }
+
     [HttpGet("leagues/{league}/leaderboard")]
     [ProducesResponseType<PagedResponse<RefereeLeaderboardEntry>>(StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResponse<RefereeLeaderboardEntry>>> GetLeaderboard(
@@ -69,6 +83,8 @@ public sealed class AnalyticsController() : ControllerBase
     public async Task<ActionResult<MatchupPreview>> GetMatchupPreview(
         [FromQuery] string refereeId, [FromQuery] string homeTeam, [FromQuery] string awayTeam, [FromQuery] string league, [FromQuery] string season, [FromQuery] bool global = false, CancellationToken ct = default)
     {
+        if (!IsPremium()) return StatusCode(403, "Premium subscription required.");
+        
         var refMatches = global 
             ? await MatchCacheService.LoadAllMatchesForRefereeAcrossLeaguesAsync(refereeId, season, ct)
             : (await MatchCacheService.LoadAllMatchesFromCacheAsync(league, season, ct)).Where(m => m.RefereeId == refereeId).ToList();
@@ -107,6 +123,8 @@ public sealed class AnalyticsController() : ControllerBase
     public async Task<ActionResult<RefereeComparison>> CompareReferees(
         [FromQuery] string refereeAId, [FromQuery] string refereeBId, [FromQuery] string league, [FromQuery] string season, [FromQuery] bool global = false, CancellationToken ct = default)
     {
+        if (!IsPremium()) return StatusCode(403, "Premium subscription required.");
+        
         var matchesA = global 
             ? await MatchCacheService.LoadAllMatchesForRefereeAcrossLeaguesAsync(refereeAId, season, ct)
             : (await MatchCacheService.LoadAllMatchesFromCacheAsync(league, season, ct)).Where(m => m.RefereeId == refereeAId).ToList();

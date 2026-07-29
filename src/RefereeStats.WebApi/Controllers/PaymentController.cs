@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RefereeStats.WebApi.Services;
 using Stripe;
+using Stripe.BillingPortal;
 using Stripe.Checkout;
 
 namespace RefereeStats.WebApi.Controllers;
@@ -40,10 +42,11 @@ public sealed class PaymentController : ControllerBase
 
         var domain = $"{Request.Scheme}://{Request.Host}";
         
-        var options = new SessionCreateOptions
+        var options = new Stripe.Checkout.SessionCreateOptions
         {
             PaymentMethodTypes = new List<string> { "card" },
-            LineItems = new List<SessionLineItemOptions>
+                AllowPromotionCodes = true,
+                LineItems = new List<SessionLineItemOptions>
             {
                 new SessionLineItemOptions
                 {
@@ -51,11 +54,7 @@ public sealed class PaymentController : ControllerBase
                     {
                         UnitAmount = 499, // 4.99€
                         Currency = "eur",
-                        ProductData = new SessionLineItemPriceDataProductDataOptions
-                        {
-                            Name = "RefereeStats Premium Analytics",
-                            Description = "Access to full cross-league stats, Matchup Predictor and historical data."
-                        },
+                        Product = "prod_UyUbrpS68PUSBZ",
                         Recurring = new SessionLineItemPriceDataRecurringOptions
                         {
                             Interval = "month"
@@ -70,8 +69,54 @@ public sealed class PaymentController : ControllerBase
             ClientReferenceId = request.Email // Usamos el email para linkarlo luego en el webhook
         };
 
-        var service = new SessionService();
-        Session session = service.Create(options);
+        var service = new Stripe.Checkout.SessionService();
+        Stripe.Checkout.Session session = service.Create(options);
+
+        return Ok(new { url = session.Url });
+    }
+
+    [HttpPost("portal")]
+    [Authorize]
+    public ActionResult CreatePortalSession()
+    {
+        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+                 ?? User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+        
+        if (string.IsNullOrEmpty(email)) return Unauthorized();
+
+        var user = _authService.GetUserByEmail(email);
+        if (user == null) return Unauthorized();
+
+        var customerId = user.StripeCustomerId;
+
+        // If no customerId or pending, try to look it up in Stripe by email
+        if (string.IsNullOrEmpty(customerId) || customerId == "PENDING_STRIPE_SYNC")
+        {
+            var customerService = new CustomerService();
+            var customers = customerService.List(new CustomerListOptions { Email = email, Limit = 1 });
+            var stripeCustomer = customers.FirstOrDefault();
+            if (stripeCustomer != null)
+            {
+                customerId = stripeCustomer.Id;
+                // Save it back so future lookups are instant
+                _authService.UpgradeUser(email, customerId);
+                _logger.LogInformation("Synced StripeCustomerId {Id} for {Email}", customerId, email);
+            }
+        }
+
+        if (string.IsNullOrEmpty(customerId))
+        {
+            return BadRequest(new { message = "No active subscription found in Stripe." });
+        }
+
+        var domain = $"{Request.Scheme}://{Request.Host}";
+        var options = new Stripe.BillingPortal.SessionCreateOptions
+        {
+            Customer = customerId,
+            ReturnUrl = domain + "/index.html",
+        };
+        var service = new Stripe.BillingPortal.SessionService();
+        var session = service.Create(options);
 
         return Ok(new { url = session.Url });
     }
@@ -90,7 +135,7 @@ public sealed class PaymentController : ControllerBase
 
             if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
             {
-                var session = stripeEvent.Data.Object as Session;
+                var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
                 if (session != null && !string.IsNullOrEmpty(session.ClientReferenceId))
                 {
                     _logger.LogInformation("Checkout Session Completed for {Email}. Customer ID: {Customer}", session.ClientReferenceId, session.CustomerId);
@@ -103,7 +148,7 @@ public sealed class PaymentController : ControllerBase
                 if (subscription != null)
                 {
                     _logger.LogInformation("Subscription {Id} deleted for customer {Customer}", subscription.Id, subscription.CustomerId);
-                    // Aquí habría que hacer un DowngradeUser buscando por CustomerId
+                    _authService.DowngradeUserByStripeId(subscription.CustomerId);
                 }
             }
 

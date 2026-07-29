@@ -104,6 +104,49 @@ public sealed class AuthService
         }
     }
 
+    public void DowngradeUserByStripeId(string stripeCustomerId)
+    {
+        var users = LoadUsers();
+        var user = users.FirstOrDefault(u => u.StripeCustomerId == stripeCustomerId);
+        if (user != null)
+        {
+            user.IsPremium = false;
+            user.StripeCustomerId = null;
+            SaveUsers(users);
+        }
+    }
+
+    public bool UpdateEmail(string oldEmail, string newEmail)
+    {
+        var users = LoadUsers();
+        if (users.Any(u => u.Email.Equals(newEmail, StringComparison.OrdinalIgnoreCase)))
+        {
+            return false; // Email already in use
+        }
+
+        var user = users.FirstOrDefault(u => u.Email.Equals(oldEmail, StringComparison.OrdinalIgnoreCase));
+        if (user != null)
+        {
+            user.Email = newEmail;
+            SaveUsers(users);
+            return true;
+        }
+        return false;
+    }
+
+    public bool UpdatePassword(string email, string newPassword)
+    {
+        var users = LoadUsers();
+        var user = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        if (user != null)
+        {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            SaveUsers(users);
+            return true;
+        }
+        return false;
+    }
+
     public string? Authenticate(string email, string password)
     {
         var users = LoadUsers();
@@ -114,6 +157,13 @@ public sealed class AuthService
             return null;
         }
 
+        return GenerateJwtToken(user);
+    }
+    
+    public string? RefreshToken(string email)
+    {
+        var user = GetUserByEmail(email);
+        if (user == null) return null;
         return GenerateJwtToken(user);
     }
 

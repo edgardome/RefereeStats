@@ -12,8 +12,22 @@ namespace RefereeStats.WebApi.Controllers;
 [ApiController]
 [Route("api/v1")]
 [Route("api")] // backward-compatible: old /api routes still work
-public sealed class RefereesController(RefereeScraper scraper, IConfiguration configuration, IMemoryCache cache) : ControllerBase
+public sealed class RefereesController(RefereeScraper scraper, IConfiguration configuration, IMemoryCache cache, AuthService authService) : ControllerBase
 {
+    private bool IsPremium()
+    {
+        if (User.Identity?.IsAuthenticated != true) return false;
+
+        // Verify live status in database instead of trusting a potentially expired token claim
+        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+                 ?? User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+        
+        if (string.IsNullOrEmpty(email)) return false;
+
+        var user = authService.GetUserByEmail(email);
+        return user?.IsPremium == true;
+    }
+
     /// <summary>Nivel 1: perfil agregado por temporada de un árbitro.</summary>
     [HttpGet("referees/{refereeId}/profile")]
     [ProducesResponseType<RefereeProfile>(StatusCodes.Status200OK)]
@@ -53,6 +67,8 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
         [FromQuery] DateOnly? since, [FromQuery] bool global = false,
         [FromQuery] int page = 0, [FromQuery] int size = 20, CancellationToken ct = default)
     {
+        if (global && !IsPremium()) return StatusCode(403, "Premium subscription required for global stats.");
+        
         var matches = await LoadMatchesFromCacheAsync(league, season, refereeId, global, ct);
         if (since.HasValue)
         {
@@ -66,6 +82,8 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
     public async Task<ActionResult<RefereeAnalytics>> GetAnalytics(
         string refereeId, [FromQuery] string league, [FromQuery] string season, [FromQuery] bool global = false, CancellationToken ct = default)
     {
+        if (global && !IsPremium()) return StatusCode(403, "Premium subscription required for global stats.");
+        
         var matches = await LoadMatchesFromCacheAsync(league, season, refereeId, global, ct);
         var analytics = RefereeAnalyticsService.ComputeAnalytics(refereeId, matches);
 
