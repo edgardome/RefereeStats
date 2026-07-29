@@ -26,7 +26,10 @@ public sealed class AuthService
         _configuration = configuration;
         _logger = logger;
         
-        var dir = Path.Combine(AppContext.BaseDirectory, "data");
+        var dataDirEnv = Environment.GetEnvironmentVariable("DATA_DIR");
+        var dir = !string.IsNullOrEmpty(dataDirEnv) 
+            ? dataDirEnv 
+            : Path.Combine(AppContext.BaseDirectory, "data");
         Directory.CreateDirectory(dir);
         _usersFilePath = Path.Combine(dir, "users.json");
 
