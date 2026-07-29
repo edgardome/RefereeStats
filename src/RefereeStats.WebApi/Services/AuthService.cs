@@ -107,10 +107,13 @@ public sealed class AuthService
         }
     }
 
-    public void DowngradeUserByStripeId(string stripeCustomerId)
+    public void DowngradeUser(string stripeCustomerId, string email)
     {
         var users = LoadUsers();
-        var user = users.FirstOrDefault(u => u.StripeCustomerId == stripeCustomerId);
+        var user = users.FirstOrDefault(u => 
+            (!string.IsNullOrEmpty(stripeCustomerId) && u.StripeCustomerId == stripeCustomerId) || 
+            (!string.IsNullOrEmpty(email) && u.Email.Equals(email, StringComparison.OrdinalIgnoreCase)));
+            
         if (user != null)
         {
             user.IsPremium = false;

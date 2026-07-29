@@ -29,10 +29,29 @@ public class FreemiumLeagueFilterAttribute : ActionFilterAttribute
 
         if (!isFreeRequest)
         {
-            // If it's not a free request, check authentication
+            // If it's not a free request, check authentication AND premium status
             if (context.HttpContext.User.Identity?.IsAuthenticated != true)
             {
                 context.Result = new UnauthorizedObjectResult(new { error = "Premium access requires authentication. Please log in or provide a valid API Key." });
+                return;
+            }
+
+            var email = context.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+                     ?? context.HttpContext.User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (string.IsNullOrEmpty(email))
+            {
+                context.Result = new UnauthorizedObjectResult(new { error = "Invalid token claims." });
+                return;
+            }
+
+            var authService = context.HttpContext.RequestServices.GetService(typeof(RefereeStats.WebApi.Services.AuthService)) as RefereeStats.WebApi.Services.AuthService;
+            var user = authService?.GetUserByEmail(email);
+
+            if (user?.IsPremium != true)
+            {
+                // We use 403 Forbidden to indicate they are authenticated but lack premium rights
+                context.Result = new ObjectResult(new { error = "Premium subscription required." }) { StatusCode = 403 };
                 return;
             }
         }

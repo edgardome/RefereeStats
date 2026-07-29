@@ -149,7 +149,21 @@ public sealed class PaymentController : ControllerBase
                 if (subscription != null)
                 {
                     _logger.LogInformation("Subscription {Id} deleted for customer {Customer}", subscription.Id, subscription.CustomerId);
-                    _authService.DowngradeUserByStripeId(subscription.CustomerId);
+                    
+                    // Fetch the customer to get their email as a fallback
+                    string customerEmail = null;
+                    try 
+                    {
+                        var custService = new CustomerService();
+                        var customer = custService.Get(subscription.CustomerId);
+                        customerEmail = customer?.Email;
+                    } 
+                    catch (Exception ex) 
+                    {
+                        _logger.LogWarning(ex, "Failed to fetch customer email from Stripe for downgrade fallback");
+                    }
+
+                    _authService.DowngradeUser(subscription.CustomerId, customerEmail);
                 }
             }
 
