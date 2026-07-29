@@ -23,14 +23,22 @@ window.fetch = async (resource, config) => {
             window.location.reload();
         } else {
             // Already logged out, just show the auth modal or premium modal
-            const premiumModal = document.getElementById('premium-modal');
-            if (premiumModal) premiumModal.classList.remove('hidden');
+            if (typeof showPremiumModal === 'function') {
+                showPremiumModal();
+            } else {
+                const premiumModal = document.getElementById('premium-modal');
+                if (premiumModal) premiumModal.classList.remove('hidden');
+            }
         }
         return Promise.reject('Unauthorized - Token Expired or Missing');
     }
     if (response.status === 403 || response.status === 402) {
-        const modal = document.getElementById('premium-modal');
-        if (modal) modal.classList.remove('hidden');
+        if (typeof showPremiumModal === 'function') {
+            showPremiumModal();
+        } else {
+            const modal = document.getElementById('premium-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
         return Promise.reject('Unauthorized - Premium Required');
     }
     return response;

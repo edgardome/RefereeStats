@@ -29,6 +29,7 @@ public sealed class PaymentController : ControllerBase
     }
 
     [HttpPost("checkout")]
+    [AllowAnonymous]
     public ActionResult CreateCheckoutSession([FromBody] CheckoutRequest request)
     {
         // Si no hay clave válida, devolvemos un mock local para que el frontend lo gestione visualmente o lance un error.
@@ -77,6 +78,7 @@ public sealed class PaymentController : ControllerBase
 
     [HttpPost("portal")]
     [Authorize]
+    [AllowAnonymous]
     public ActionResult CreatePortalSession()
     {
         var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
