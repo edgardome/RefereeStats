@@ -28,6 +28,66 @@ window.fetch = async (resource, config) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const leagueSelect = document.getElementById('league-select');
+    
+    // Build the options data from the original select BEFORE TomSelect touches it
+    const allLeagueOptions = [];
+    if (leagueSelect) {
+        Array.from(leagueSelect.querySelectorAll('optgroup')).forEach(group => {
+            const country = group.label;
+            Array.from(group.querySelectorAll('option')).forEach(opt => {
+                allLeagueOptions.push({ value: opt.value, text: opt.textContent, country });
+            });
+        });
+    }
+    
+    // Init TomSelect for leagues using the internal options/optgroups API
+    function initLeagueSelect(filterCountry) {
+        if (window.tsLeague) window.tsLeague.destroy();
+        
+        const filteredOptions = filterCountry
+            ? allLeagueOptions.filter(o => o.country === filterCountry)
+            : allLeagueOptions;
+        
+        // Build unique optgroups list
+        const optgroupSet = [...new Set(filteredOptions.map(o => o.country))];
+        
+        window.tsLeague = new TomSelect(leagueSelect, {
+            create: false,
+            options: filteredOptions.map(o => ({ value: o.value, text: o.text, optgroup: o.country })),
+            optgroups: optgroupSet.map(c => ({ value: c, label: c })),
+            optgroupField: 'optgroup',
+            labelField: 'text',
+            valueField: 'value',
+            searchField: ['text'],
+            sortField: { field: "text", direction: "asc" },
+            controlInput: '<input type="text" autocomplete="new-password" data-lpignore="true" spellcheck="false">',
+            onChange: loadReferees
+        });
+        
+        // Select first available option
+        if (filteredOptions.length > 0) {
+            window.tsLeague.setValue(filteredOptions[0].value, true);
+        }
+    }
+    
+    if (leagueSelect) {
+        initLeagueSelect(null);
+    }
+    
+    const countrySelect = document.getElementById('country-select');
+    if (countrySelect) {
+        window.tsCountry = new TomSelect(countrySelect, {
+            create: false,
+            sortField: { field: "text", direction: "asc" },
+            controlInput: '<input type="text" autocomplete="new-password" data-lpignore="true" spellcheck="false">'
+        });
+        
+        window.tsCountry.on('change', (val) => {
+            initLeagueSelect(val === 'all' ? null : val);
+            loadReferees();
+        });
+    }
+
     const seasonSelect = document.getElementById('season-select');
     const refereeSelect = document.getElementById('referee-select');
     const syncButton = document.getElementById('sync-button');
@@ -330,8 +390,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-close-modal')?.addEventListener('click', () => {
         premiumModal.classList.add('hidden');
         // Revert league select to LaLiga 2 (free) so they don't get stuck
-        if (leagueSelect) {
-            leagueSelect.value = 'LaLiga 2';
+        if (window.tsLeague) {
+            window.tsLeague.setValue('ES2');
             loadReferees();
         }
     });

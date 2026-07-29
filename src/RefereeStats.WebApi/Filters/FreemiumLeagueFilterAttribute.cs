@@ -5,7 +5,7 @@ namespace RefereeStats.WebApi.Filters;
 
 public class FreemiumLeagueFilterAttribute : ActionFilterAttribute
 {
-    private readonly string _freeLeague = "laliga2";
+    private readonly string _freeLeague = "ES2";
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {

@@ -1027,3 +1027,55 @@ input:checked + .slider:before {
 .btn-close-modal:hover {
     color: var(--color-text-main);
 }
+
+/* Tom Select overrides for light/dark themes */
+.ts-control {
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--color-text-main) !important;
+    padding: 10px 14px !important;
+    min-height: 44px !important;
+    box-shadow: none !important;
+    font-family: var(--font-body) !important;
+}
+.ts-control input {
+    color: var(--color-text-main) !important;
+    font-family: var(--font-body) !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    width: auto !important;
+    margin: 0 !important;
+}
+.ts-control input:focus {
+    border: none !important;
+    box-shadow: none !important;
+}
+.ts-dropdown {
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--color-text-main) !important;
+    box-shadow: var(--shadow-lg) !important;
+    margin-top: 4px !important;
+    font-family: var(--font-body) !important;
+}
+.ts-dropdown .option {
+    padding: 8px 14px !important;
+    transition: background 0.2s ease !important;
+}
+.ts-dropdown .option.active, .ts-dropdown .option:hover {
+    background: var(--accent-primary-glow) !important;
+    color: var(--accent-primary) !important;
+}
+.ts-dropdown .optgroup-header {
+    background: var(--bg-card) !important;
+    color: var(--color-text-muted) !important;
+    font-weight: 600 !important;
+    padding: 6px 14px !important;
+    font-size: 0.85rem !important;
+    border-bottom: 1px solid var(--border-color);
+}
+

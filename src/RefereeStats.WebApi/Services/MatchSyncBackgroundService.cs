@@ -41,7 +41,39 @@ public sealed class MatchSyncBackgroundService(
         }
 
         var intervalHours = section.GetValue("IntervalHours", 12);
-        var targets = section.GetSection("Targets").Get<List<SyncTarget>>() ?? GetDefaultTargets();
+        
+        var targets = new List<SyncTarget>();
+        var leaguesJsonPath = Path.Combine(Environment.CurrentDirectory, "data", "transfermarkt_leagues.json");
+        if (File.Exists(leaguesJsonPath))
+        {
+            try
+            {
+                var json = File.ReadAllText(leaguesJsonPath);
+                var element = JsonDocument.Parse(json).RootElement;
+                foreach (var item in element.EnumerateArray())
+                {
+                    if (item.TryGetProperty("code", out var codeProp) && codeProp.ValueKind == JsonValueKind.String)
+                    {
+                        var code = codeProp.GetString();
+                        if (!string.IsNullOrEmpty(code))
+                        {
+                            // Sync current and previous season for each league by default
+                            targets.Add(new SyncTarget { League = code, Season = "2024-2025" });
+                            targets.Add(new SyncTarget { League = code, Season = "2023-2024" });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to load dynamic targets from transfermarkt_leagues.json");
+            }
+        }
+        
+        if (targets.Count == 0)
+        {
+            targets = section.GetSection("Targets").Get<List<SyncTarget>>() ?? GetDefaultTargets();
+        }
 
         Log.Information("MatchSyncBackgroundService started. Interval: {IntervalHours} hours. Targets count: {Count}", intervalHours, targets.Count);
 

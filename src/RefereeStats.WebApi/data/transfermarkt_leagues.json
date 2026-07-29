@@ -1,0 +1,1073 @@
+[
+  {
+    "code": "GB1",
+    "name": "Premier League",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Inglaterra"
+  },
+  {
+    "code": "ES1",
+    "name": "LaLiga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "España"
+  },
+  {
+    "code": "IT1",
+    "name": "Serie A",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Italia"
+  },
+  {
+    "code": "L1",
+    "name": "Bundesliga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Alemania"
+  },
+  {
+    "code": "FR1",
+    "name": "Ligue 1",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Francia"
+  },
+  {
+    "code": "PO1",
+    "name": "Liga Portugal",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Portugal"
+  },
+  {
+    "code": "TR1",
+    "name": "Süper Lig",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Turquía"
+  },
+  {
+    "code": "NL1",
+    "name": "Eredivisie",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Países Bajos"
+  },
+  {
+    "code": "RU1",
+    "name": "Premier Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Rusia"
+  },
+  {
+    "code": "BE1",
+    "name": "Jupiler Pro League",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Bélgica"
+  },
+  {
+    "code": "GR1",
+    "name": "Super League 1",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Grecia"
+  },
+  {
+    "code": "UKR1",
+    "name": "Premier de Ucrania",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Ucrania"
+  },
+  {
+    "code": "TS1",
+    "name": "Chance Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "República Checa"
+  },
+  {
+    "code": "DK1",
+    "name": "Superliga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Dinamarca"
+  },
+  {
+    "code": "SC1",
+    "name": "Premiership",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Escocia"
+  },
+  {
+    "code": "PL1",
+    "name": "Ekstraklasa",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Polonia"
+  },
+  {
+    "code": "NO1",
+    "name": "Eliteserien",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Noruega"
+  },
+  {
+    "code": "A1",
+    "name": "Bundesliga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Austria"
+  },
+  {
+    "code": "C1",
+    "name": "Super League",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Suiza"
+  },
+  {
+    "code": "SER1",
+    "name": "Super liga Srbije",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Serbia"
+  },
+  {
+    "code": "SE1",
+    "name": "Allsvenskan",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Suecia"
+  },
+  {
+    "code": "RO1",
+    "name": "SuperLiga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Rumania"
+  },
+  {
+    "code": "KR1",
+    "name": "SuperSport HNL",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Croacia"
+  },
+  {
+    "code": "BU1",
+    "name": "efbet Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Bulgaria"
+  },
+  {
+    "code": "ISR1",
+    "name": "Ligat ha'Al",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Israel"
+  },
+  {
+    "code": "UNG1",
+    "name": "NB I.",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Hungría"
+  },
+  {
+    "code": "ZYP1",
+    "name": "Cyprus League",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Chipre"
+  },
+  {
+    "code": "AZ1",
+    "name": "Premyer Liqa",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Azerbaiyán"
+  },
+  {
+    "code": "SLO1",
+    "name": "Niké Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Eslovaquia"
+  },
+  {
+    "code": "KAS1",
+    "name": "Premier Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Kazajistán"
+  },
+  {
+    "code": "WER1",
+    "name": "Vysheyshaya Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Bielorrusia"
+  },
+  {
+    "code": "SL1",
+    "name": "Prva Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Eslovenia"
+  },
+  {
+    "code": "LI1",
+    "name": "Toplyga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Lituania"
+  },
+  {
+    "code": "LET1",
+    "name": "Virsliga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Letonia"
+  },
+  {
+    "code": "ARM1",
+    "name": "Premier League",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Armenia"
+  },
+  {
+    "code": "ALB1",
+    "name": "Kategoria Superiore",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Albania"
+  },
+  {
+    "code": "BOS1",
+    "name": "Premijer Liga BiH",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Bosnia y Herzegovina"
+  },
+  {
+    "code": "FI1",
+    "name": "Veikkausliiga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Finlandia"
+  },
+  {
+    "code": "MT1N",
+    "name": "Premier League Opening Round",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Malta"
+  },
+  {
+    "code": "GE1N",
+    "name": "Erovnuli Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Georgia"
+  },
+  {
+    "code": "KO1",
+    "name": "Superliga e Kosovës",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Kosovo"
+  },
+  {
+    "code": "IR1",
+    "name": "Premier Division",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Irlanda"
+  },
+  {
+    "code": "IS1",
+    "name": "Besta deild",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Islandia"
+  },
+  {
+    "code": "MNE1",
+    "name": "Meridianbet 1. CFL",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Montenegro"
+  },
+  {
+    "code": "EST1",
+    "name": "Premium Liiga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Estonia"
+  },
+  {
+    "code": "MAZ1",
+    "name": "Prva liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Macedonia del Norte"
+  },
+  {
+    "code": "NIR1",
+    "name": "Premiership",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Irlanda del Norte"
+  },
+  {
+    "code": "MO1N",
+    "name": "Super Liga",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Moldavia"
+  },
+  {
+    "code": "AND1",
+    "name": "Primera Divisió",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Andorra"
+  },
+  {
+    "code": "LUX1",
+    "name": "BGL Ligue",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Luxemburgo"
+  },
+  {
+    "code": "FARO",
+    "name": "Meistaradeildin",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Islas Feroe"
+  },
+  {
+    "code": "WAL1",
+    "name": "Cymru Premier",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Gales"
+  },
+  {
+    "code": "GI1",
+    "name": "Gibraltar Football League",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "Gibraltar"
+  },
+  {
+    "code": "SMR1",
+    "name": "Camp. Sammarinese",
+    "continent": "europa",
+    "tier": "Primera División",
+    "country": "San Marino"
+  },
+  {
+    "code": "GB2",
+    "name": "Championship",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Inglaterra"
+  },
+  {
+    "code": "L2",
+    "name": "2. Bundesliga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Alemania"
+  },
+  {
+    "code": "ES2",
+    "name": "2ª División",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "España"
+  },
+  {
+    "code": "IT2",
+    "name": "Serie B",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Italia"
+  },
+  {
+    "code": "FR2",
+    "name": "Ligue 2",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Francia"
+  },
+  {
+    "code": "PO2",
+    "name": "Liga Portugal 2",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Portugal"
+  },
+  {
+    "code": "TR2",
+    "name": "1.Lig",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Turquía"
+  },
+  {
+    "code": "RU2",
+    "name": "1.Division",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Rusia"
+  },
+  {
+    "code": "NL2",
+    "name": "Keuken Kampioen Divisie",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Países Bajos"
+  },
+  {
+    "code": "BE2",
+    "name": "Challenger Pro League",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Bélgica"
+  },
+  {
+    "code": "SE2",
+    "name": "Superettan",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Suecia"
+  },
+  {
+    "code": "NO2",
+    "name": "OBOS-ligaen",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Noruega"
+  },
+  {
+    "code": "PL2",
+    "name": "Betclic 1 Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Polonia"
+  },
+  {
+    "code": "DK2",
+    "name": "1.Division",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Dinamarca"
+  },
+  {
+    "code": "SER2",
+    "name": "Prva liga Srbije",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Serbia"
+  },
+  {
+    "code": "TS2",
+    "name": "ChNL",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "República Checa"
+  },
+  {
+    "code": "A2",
+    "name": "2. Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Austria"
+  },
+  {
+    "code": "GRS2",
+    "name": "Super League 2",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Grecia"
+  },
+  {
+    "code": "RO2",
+    "name": "Liga 2",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Rumania"
+  },
+  {
+    "code": "C2",
+    "name": "Challenge League",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Suiza"
+  },
+  {
+    "code": "UKR2",
+    "name": "Persha Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Ucrania"
+  },
+  {
+    "code": "BU2",
+    "name": "Vtora Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Bulgaria"
+  },
+  {
+    "code": "KR2",
+    "name": "Prva NL",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Croacia"
+  },
+  {
+    "code": "ISR2",
+    "name": "Liga Leumit",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Israel"
+  },
+  {
+    "code": "UN2",
+    "name": "NB II.",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Hungría"
+  },
+  {
+    "code": "WER2",
+    "name": "Pershaya Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Bielorrusia"
+  },
+  {
+    "code": "ALB2",
+    "name": "Kategoria e Parë",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Albania"
+  },
+  {
+    "code": "BOS2",
+    "name": "Prva liga FBIH",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Bosnia y Herzegovina"
+  },
+  {
+    "code": "SC2",
+    "name": "Championship",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Escocia"
+  },
+  {
+    "code": "SL2",
+    "name": "Druga Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Eslovenia"
+  },
+  {
+    "code": "SK2",
+    "name": "II. Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Eslovaquia"
+  },
+  {
+    "code": "BH2S",
+    "name": "Prva Liga RS",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Bosnia y Herzegovina"
+  },
+  {
+    "code": "IS2",
+    "name": "Lengjudeild",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Islandia"
+  },
+  {
+    "code": "FI2",
+    "name": "Ykkösliiga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Finlandia"
+  },
+  {
+    "code": "ARM2",
+    "name": "First League",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Armenia"
+  },
+  {
+    "code": "MAL2",
+    "name": "Challenge League",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Malta"
+  },
+  {
+    "code": "CYP2",
+    "name": "Segunda División",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Chipre"
+  },
+  {
+    "code": "LUX2",
+    "name": "Ehrenpromotion",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Luxemburgo"
+  },
+  {
+    "code": "LTU2",
+    "name": "I Lyga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Lituania"
+  },
+  {
+    "code": "KAS2",
+    "name": "Pervaya Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Kazajistán"
+  },
+  {
+    "code": "NIR2",
+    "name": "Championship",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Irlanda del Norte"
+  },
+  {
+    "code": "MNE2",
+    "name": "Druga Liga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Montenegro"
+  },
+  {
+    "code": "GEO2",
+    "name": "Erovnuli Liga 2",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Georgia"
+  },
+  {
+    "code": "WAL2",
+    "name": "Cymru North",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Gales"
+  },
+  {
+    "code": "LET2",
+    "name": "Futbola Pirmā līga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Letonia"
+  },
+  {
+    "code": "FAR2",
+    "name": "1. deild",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Islas Feroe"
+  },
+  {
+    "code": "IR2",
+    "name": "First Division",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Irlanda"
+  },
+  {
+    "code": "WA2S",
+    "name": "Cymru South",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Gales"
+  },
+  {
+    "code": "MDL2",
+    "name": "Liga 1",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Moldavia"
+  },
+  {
+    "code": "EST2",
+    "name": "Esiliiga",
+    "continent": "europa",
+    "tier": "Segunda División",
+    "country": "Estonia"
+  },
+  {
+    "code": "BRA1",
+    "name": "Série A",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Brasil"
+  },
+  {
+    "code": "MLS1",
+    "name": "MLS",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Estados Unidos"
+  },
+  {
+    "code": "ARG1",
+    "name": "Torneo Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Argentina"
+  },
+  {
+    "code": "ARGC",
+    "name": "Torneo Clausura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Argentina"
+  },
+  {
+    "code": "MEX1",
+    "name": "Liga MX Clausura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "México"
+  },
+  {
+    "code": "MEXA",
+    "name": "Liga MX Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "México"
+  },
+  {
+    "code": "COL1",
+    "name": "Liga DIMAYOR II",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Colombia"
+  },
+  {
+    "code": "COLP",
+    "name": "Liga DIMAYOR I",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Colombia"
+  },
+  {
+    "code": "EC1N",
+    "name": "LigaPro Serie A",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Ecuador"
+  },
+  {
+    "code": "CLPD",
+    "name": "Liga Primera",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Chile"
+  },
+  {
+    "code": "URU1",
+    "name": "Liga AUF Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Uruguay"
+  },
+  {
+    "code": "URUI",
+    "name": "Liga AUF Intermedio",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Uruguay"
+  },
+  {
+    "code": "PR1A",
+    "name": "Primera División Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Paraguay"
+  },
+  {
+    "code": "PR1C",
+    "name": "Primera División Clausura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Paraguay"
+  },
+  {
+    "code": "TDeA",
+    "name": "Liga 1 Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Perú"
+  },
+  {
+    "code": "TDeC",
+    "name": "Liga 1 Clausura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Perú"
+  },
+  {
+    "code": "VZ1A",
+    "name": "Liga FUTVE Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Venezuela"
+  },
+  {
+    "code": "BO1A",
+    "name": "División Profesional",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Bolivia"
+  },
+  {
+    "code": "CRPD",
+    "name": "Primera División Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Costa Rica"
+  },
+  {
+    "code": "GU1A",
+    "name": "Liga Nacional Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Guatemala"
+  },
+  {
+    "code": "HO1A",
+    "name": "Liga Nacional Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Honduras"
+  },
+  {
+    "code": "PN1A",
+    "name": "Liga Panameña Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Panamá"
+  },
+  {
+    "code": "PN1C",
+    "name": "Liga Panameña Clausura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Panamá"
+  },
+  {
+    "code": "SL1A",
+    "name": "Primera División Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "El Salvador"
+  },
+  {
+    "code": "SL1C",
+    "name": "Primera División Clausura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "El Salvador"
+  },
+  {
+    "code": "CDN1",
+    "name": "CanPL",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Canadá"
+  },
+  {
+    "code": "NC1A",
+    "name": "Liga Primera Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Nicaragua"
+  },
+  {
+    "code": "JPL1",
+    "name": "Jamaica Premier League",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Jamaica"
+  },
+  {
+    "code": "DO1P",
+    "name": "Liga Dominicana - Liguilla",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "República Dominicana"
+  },
+  {
+    "code": "DOM1",
+    "name": "Liga Dominicana de Fútbol",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "República Dominicana"
+  },
+  {
+    "code": "DOMP",
+    "name": "Liga Dominicana - Playoff",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "República Dominicana"
+  },
+  {
+    "code": "PRA1",
+    "name": "Liga Puerto Rico Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Puerto Rico"
+  },
+  {
+    "code": "BZ1A",
+    "name": "Liga de Belice Apertura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Belice"
+  },
+  {
+    "code": "BZ1C",
+    "name": "Liga de Belice Clausura",
+    "continent": "amerika",
+    "tier": "Primera División",
+    "country": "Belice"
+  },
+  {
+    "code": "BRA2",
+    "name": "Série B",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Brasil"
+  },
+  {
+    "code": "ARG2",
+    "name": "Primera Nacional",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Argentina"
+  },
+  {
+    "code": "USL",
+    "name": "USLC",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Estados Unidos"
+  },
+  {
+    "code": "MEX2",
+    "name": "Liga Expansión MX Cl.",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "México"
+  },
+  {
+    "code": "MEXB",
+    "name": "Liga Expansión MX Ap.",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "México"
+  },
+  {
+    "code": "CL2B",
+    "name": "Liga de Ascenso",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Chile"
+  },
+  {
+    "code": "CO22",
+    "name": "Torneo DIMAYOR II",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Colombia"
+  },
+  {
+    "code": "CO2T",
+    "name": "Torneo DIMAYOR I",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Colombia"
+  },
+  {
+    "code": "PER2",
+    "name": "Liga 2",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Perú"
+  },
+  {
+    "code": "UR2T",
+    "name": "Torneo Competencia",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Uruguay"
+  },
+  {
+    "code": "URU2",
+    "name": "Segunda División",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Uruguay"
+  },
+  {
+    "code": "VN2A",
+    "name": "Liga FUTVE 2",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Venezuela"
+  },
+  {
+    "code": "EC2L",
+    "name": "Liga Pro Serie B",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Ecuador"
+  },
+  {
+    "code": "PAR2",
+    "name": "División Intermedia",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Paraguay"
+  },
+  {
+    "code": "BOL2",
+    "name": "Copa S. Bolívar - Fase Departamental",
+    "continent": "amerika",
+    "tier": "Segunda División",
+    "country": "Bolivia"
+  }
+]

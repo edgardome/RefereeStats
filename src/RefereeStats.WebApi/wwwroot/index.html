@@ -59,23 +59,402 @@
         <!-- Selector Controls -->
         <section class="controls-card glass-panel">
             <div class="selector-group">
+
+                  <div class="control-box country-box">
+                      <label for="country-select" data-i18n="countryLabel">País</label>
+                      <select id="country-select">
+<option value="all">Todos los países</option>
+    <option value="Albania">Albania</option>
+    <option value="Alemania">Alemania</option>
+    <option value="Andorra">Andorra</option>
+    <option value="Argentina">Argentina</option>
+    <option value="Armenia">Armenia</option>
+    <option value="Austria">Austria</option>
+    <option value="Azerbaiyán">Azerbaiyán</option>
+    <option value="Belice">Belice</option>
+    <option value="Bielorrusia">Bielorrusia</option>
+    <option value="Bolivia">Bolivia</option>
+    <option value="Bosnia y Herzegovina">Bosnia y Herzegovina</option>
+    <option value="Brasil">Brasil</option>
+    <option value="Bulgaria">Bulgaria</option>
+    <option value="Bélgica">Bélgica</option>
+    <option value="Canadá">Canadá</option>
+    <option value="Chile">Chile</option>
+    <option value="Chipre">Chipre</option>
+    <option value="Colombia">Colombia</option>
+    <option value="Costa Rica">Costa Rica</option>
+    <option value="Croacia">Croacia</option>
+    <option value="Dinamarca">Dinamarca</option>
+    <option value="Ecuador">Ecuador</option>
+    <option value="El Salvador">El Salvador</option>
+    <option value="Escocia">Escocia</option>
+    <option value="Eslovaquia">Eslovaquia</option>
+    <option value="Eslovenia">Eslovenia</option>
+    <option value="España">España</option>
+    <option value="Estados Unidos">Estados Unidos</option>
+    <option value="Estonia">Estonia</option>
+    <option value="Finlandia">Finlandia</option>
+    <option value="Francia">Francia</option>
+    <option value="Gales">Gales</option>
+    <option value="Georgia">Georgia</option>
+    <option value="Gibraltar">Gibraltar</option>
+    <option value="Grecia">Grecia</option>
+    <option value="Guatemala">Guatemala</option>
+    <option value="Honduras">Honduras</option>
+    <option value="Hungría">Hungría</option>
+    <option value="Inglaterra">Inglaterra</option>
+    <option value="Irlanda">Irlanda</option>
+    <option value="Irlanda del Norte">Irlanda del Norte</option>
+    <option value="Islandia">Islandia</option>
+    <option value="Islas Feroe">Islas Feroe</option>
+    <option value="Israel">Israel</option>
+    <option value="Italia">Italia</option>
+    <option value="Jamaica">Jamaica</option>
+    <option value="Kazajistán">Kazajistán</option>
+    <option value="Kosovo">Kosovo</option>
+    <option value="Letonia">Letonia</option>
+    <option value="Lituania">Lituania</option>
+    <option value="Luxemburgo">Luxemburgo</option>
+    <option value="Macedonia del Norte">Macedonia del Norte</option>
+    <option value="Malta">Malta</option>
+    <option value="Moldavia">Moldavia</option>
+    <option value="Montenegro">Montenegro</option>
+    <option value="México">México</option>
+    <option value="Nicaragua">Nicaragua</option>
+    <option value="Noruega">Noruega</option>
+    <option value="Panamá">Panamá</option>
+    <option value="Paraguay">Paraguay</option>
+    <option value="Países Bajos">Países Bajos</option>
+    <option value="Perú">Perú</option>
+    <option value="Polonia">Polonia</option>
+    <option value="Portugal">Portugal</option>
+    <option value="Puerto Rico">Puerto Rico</option>
+    <option value="República Checa">República Checa</option>
+    <option value="República Dominicana">República Dominicana</option>
+    <option value="Rumania">Rumania</option>
+    <option value="Rusia">Rusia</option>
+    <option value="San Marino">San Marino</option>
+    <option value="Serbia">Serbia</option>
+    <option value="Suecia">Suecia</option>
+    <option value="Suiza">Suiza</option>
+    <option value="Turquía">Turquía</option>
+    <option value="Ucrania">Ucrania</option>
+    <option value="Uruguay">Uruguay</option>
+    <option value="Venezuela">Venezuela</option>
+                      </select>
+                  </div>
+
                 <div class="control-box">
                     <label for="league-select" data-i18n="leagueLabel">League</label>
                     <select id="league-select">
-                        <option value="laliga">LaLiga (Spain)</option>
-                        <option value="laliga2" selected>LaLiga 2 (Spain)</option>
-                        <option value="premier">Premier League (England)</option>
-                        <option value="championship">Championship (England)</option>
-                        <option value="primera-federacion-grupo-i">Primera Federación - Grupo 1 (Spain)</option>
-                        <option value="primera-federacion-grupo-ii">Primera Federación - Grupo 2 (Spain)</option>
-                        <option value="segunda-federacion-grupo-i">Segunda Federación - Grupo 1 (Spain)</option>
-                        <option value="segunda-federacion-grupo-ii">Segunda Federación - Grupo 2 (Spain)</option>
-                        <option value="segunda-federacion-grupo-iii">Segunda Federación - Grupo 3 (Spain)</option>
-                        <option value="segunda-federacion-grupo-iv">Segunda Federación - Grupo 4 (Spain)</option>
-                        <option value="segunda-federacion-grupo-v">Segunda Federación - Grupo 5 (Spain)</option>
-                        <option value="copa-del-rey">Copa del Rey (Spain)</option>
-                        <option value="copa-federacion">Copa Federación (Spain)</option>
-                    </select>
+    <optgroup label="Albania">
+        <option value="ALB1" data-country="Albania">Kategoria Superiore (Primera División)</option>
+        <option value="ALB2" data-country="Albania">Kategoria e Parë (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Alemania">
+        <option value="L1" data-country="Alemania">Bundesliga (Primera División)</option>
+        <option value="L2" data-country="Alemania">2. Bundesliga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Andorra">
+        <option value="AND1" data-country="Andorra">Primera Divisió (Primera División)</option>
+    </optgroup>
+    <optgroup label="Argentina">
+        <option value="ARG1" data-country="Argentina">Torneo Apertura (Primera División)</option>
+        <option value="ARGC" data-country="Argentina">Torneo Clausura (Primera División)</option>
+        <option value="ARG2" data-country="Argentina">Primera Nacional (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Armenia">
+        <option value="ARM1" data-country="Armenia">Premier League (Primera División)</option>
+        <option value="ARM2" data-country="Armenia">First League (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Austria">
+        <option value="A1" data-country="Austria">Bundesliga (Primera División)</option>
+        <option value="A2" data-country="Austria">2. Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Azerbaiyán">
+        <option value="AZ1" data-country="Azerbaiyán">Premyer Liqa (Primera División)</option>
+    </optgroup>
+    <optgroup label="Belice">
+        <option value="BZ1A" data-country="Belice">Liga de Belice Apertura (Primera División)</option>
+        <option value="BZ1C" data-country="Belice">Liga de Belice Clausura (Primera División)</option>
+    </optgroup>
+    <optgroup label="Bielorrusia">
+        <option value="WER1" data-country="Bielorrusia">Vysheyshaya Liga (Primera División)</option>
+        <option value="WER2" data-country="Bielorrusia">Pershaya Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Bolivia">
+        <option value="BO1A" data-country="Bolivia">División Profesional (Primera División)</option>
+        <option value="BOL2" data-country="Bolivia">Copa S. Bolívar - Fase Departamental (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Bosnia y Herzegovina">
+        <option value="BOS1" data-country="Bosnia y Herzegovina">Premijer Liga BiH (Primera División)</option>
+        <option value="BOS2" data-country="Bosnia y Herzegovina">Prva liga FBIH (Segunda División)</option>
+        <option value="BH2S" data-country="Bosnia y Herzegovina">Prva Liga RS (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Brasil">
+        <option value="BRA1" data-country="Brasil">Série A (Primera División)</option>
+        <option value="BRA2" data-country="Brasil">Série B (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Bulgaria">
+        <option value="BU1" data-country="Bulgaria">efbet Liga (Primera División)</option>
+        <option value="BU2" data-country="Bulgaria">Vtora Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Bélgica">
+        <option value="BE1" data-country="Bélgica">Jupiler Pro League (Primera División)</option>
+        <option value="BE2" data-country="Bélgica">Challenger Pro League (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Canadá">
+        <option value="CDN1" data-country="Canadá">CanPL (Primera División)</option>
+    </optgroup>
+    <optgroup label="Chile">
+        <option value="CLPD" data-country="Chile">Liga Primera (Primera División)</option>
+        <option value="CL2B" data-country="Chile">Liga de Ascenso (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Chipre">
+        <option value="ZYP1" data-country="Chipre">Cyprus League (Primera División)</option>
+        <option value="CYP2" data-country="Chipre">Segunda División (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Colombia">
+        <option value="COL1" data-country="Colombia">Liga DIMAYOR II (Primera División)</option>
+        <option value="COLP" data-country="Colombia">Liga DIMAYOR I (Primera División)</option>
+        <option value="CO22" data-country="Colombia">Torneo DIMAYOR II (Segunda División)</option>
+        <option value="CO2T" data-country="Colombia">Torneo DIMAYOR I (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Costa Rica">
+        <option value="CRPD" data-country="Costa Rica">Primera División Apertura (Primera División)</option>
+    </optgroup>
+    <optgroup label="Croacia">
+        <option value="KR1" data-country="Croacia">SuperSport HNL (Primera División)</option>
+        <option value="KR2" data-country="Croacia">Prva NL (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Dinamarca">
+        <option value="DK1" data-country="Dinamarca">Superliga (Primera División)</option>
+        <option value="DK2" data-country="Dinamarca">1.Division (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Ecuador">
+        <option value="EC1N" data-country="Ecuador">LigaPro Serie A (Primera División)</option>
+        <option value="EC2L" data-country="Ecuador">Liga Pro Serie B (Segunda División)</option>
+    </optgroup>
+    <optgroup label="El Salvador">
+        <option value="SL1A" data-country="El Salvador">Primera División Apertura (Primera División)</option>
+        <option value="SL1C" data-country="El Salvador">Primera División Clausura (Primera División)</option>
+    </optgroup>
+    <optgroup label="Escocia">
+        <option value="SC1" data-country="Escocia">Premiership (Primera División)</option>
+        <option value="SC2" data-country="Escocia">Championship (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Eslovaquia">
+        <option value="SLO1" data-country="Eslovaquia">Niké Liga (Primera División)</option>
+        <option value="SK2" data-country="Eslovaquia">II. Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Eslovenia">
+        <option value="SL1" data-country="Eslovenia">Prva Liga (Primera División)</option>
+        <option value="SL2" data-country="Eslovenia">Druga Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="España">
+        <option value="ES1" data-country="España">LaLiga (Primera División)</option>
+        <option value="ES2" data-country="España">2ª División (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Estados Unidos">
+        <option value="MLS1" data-country="Estados Unidos">MLS (Primera División)</option>
+        <option value="USL" data-country="Estados Unidos">USLC (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Estonia">
+        <option value="EST1" data-country="Estonia">Premium Liiga (Primera División)</option>
+        <option value="EST2" data-country="Estonia">Esiliiga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Finlandia">
+        <option value="FI1" data-country="Finlandia">Veikkausliiga (Primera División)</option>
+        <option value="FI2" data-country="Finlandia">Ykkösliiga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Francia">
+        <option value="FR1" data-country="Francia">Ligue 1 (Primera División)</option>
+        <option value="FR2" data-country="Francia">Ligue 2 (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Gales">
+        <option value="WAL1" data-country="Gales">Cymru Premier (Primera División)</option>
+        <option value="WAL2" data-country="Gales">Cymru North (Segunda División)</option>
+        <option value="WA2S" data-country="Gales">Cymru South (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Georgia">
+        <option value="GE1N" data-country="Georgia">Erovnuli Liga (Primera División)</option>
+        <option value="GEO2" data-country="Georgia">Erovnuli Liga 2 (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Gibraltar">
+        <option value="GI1" data-country="Gibraltar">Gibraltar Football League (Primera División)</option>
+    </optgroup>
+    <optgroup label="Grecia">
+        <option value="GR1" data-country="Grecia">Super League 1 (Primera División)</option>
+        <option value="GRS2" data-country="Grecia">Super League 2 (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Guatemala">
+        <option value="GU1A" data-country="Guatemala">Liga Nacional Apertura (Primera División)</option>
+    </optgroup>
+    <optgroup label="Honduras">
+        <option value="HO1A" data-country="Honduras">Liga Nacional Apertura (Primera División)</option>
+    </optgroup>
+    <optgroup label="Hungría">
+        <option value="UNG1" data-country="Hungría">NB I. (Primera División)</option>
+        <option value="UN2" data-country="Hungría">NB II. (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Inglaterra">
+        <option value="GB1" data-country="Inglaterra">Premier League (Primera División)</option>
+        <option value="GB2" data-country="Inglaterra">Championship (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Irlanda">
+        <option value="IR1" data-country="Irlanda">Premier Division (Primera División)</option>
+        <option value="IR2" data-country="Irlanda">First Division (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Irlanda del Norte">
+        <option value="NIR1" data-country="Irlanda del Norte">Premiership (Primera División)</option>
+        <option value="NIR2" data-country="Irlanda del Norte">Championship (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Islandia">
+        <option value="IS1" data-country="Islandia">Besta deild (Primera División)</option>
+        <option value="IS2" data-country="Islandia">Lengjudeild (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Islas Feroe">
+        <option value="FARO" data-country="Islas Feroe">Meistaradeildin (Primera División)</option>
+        <option value="FAR2" data-country="Islas Feroe">1. deild (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Israel">
+        <option value="ISR1" data-country="Israel">Ligat ha'Al (Primera División)</option>
+        <option value="ISR2" data-country="Israel">Liga Leumit (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Italia">
+        <option value="IT1" data-country="Italia">Serie A (Primera División)</option>
+        <option value="IT2" data-country="Italia">Serie B (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Jamaica">
+        <option value="JPL1" data-country="Jamaica">Jamaica Premier League (Primera División)</option>
+    </optgroup>
+    <optgroup label="Kazajistán">
+        <option value="KAS1" data-country="Kazajistán">Premier Liga (Primera División)</option>
+        <option value="KAS2" data-country="Kazajistán">Pervaya Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Kosovo">
+        <option value="KO1" data-country="Kosovo">Superliga e Kosovës (Primera División)</option>
+    </optgroup>
+    <optgroup label="Letonia">
+        <option value="LET1" data-country="Letonia">Virsliga (Primera División)</option>
+        <option value="LET2" data-country="Letonia">Futbola Pirmā līga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Lituania">
+        <option value="LI1" data-country="Lituania">Toplyga (Primera División)</option>
+        <option value="LTU2" data-country="Lituania">I Lyga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Luxemburgo">
+        <option value="LUX1" data-country="Luxemburgo">BGL Ligue (Primera División)</option>
+        <option value="LUX2" data-country="Luxemburgo">Ehrenpromotion (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Macedonia del Norte">
+        <option value="MAZ1" data-country="Macedonia del Norte">Prva liga (Primera División)</option>
+    </optgroup>
+    <optgroup label="Malta">
+        <option value="MT1N" data-country="Malta">Premier League Opening Round (Primera División)</option>
+        <option value="MAL2" data-country="Malta">Challenge League (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Moldavia">
+        <option value="MO1N" data-country="Moldavia">Super Liga (Primera División)</option>
+        <option value="MDL2" data-country="Moldavia">Liga 1 (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Montenegro">
+        <option value="MNE1" data-country="Montenegro">Meridianbet 1. CFL (Primera División)</option>
+        <option value="MNE2" data-country="Montenegro">Druga Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="México">
+        <option value="MEX1" data-country="México">Liga MX Clausura (Primera División)</option>
+        <option value="MEXA" data-country="México">Liga MX Apertura (Primera División)</option>
+        <option value="MEX2" data-country="México">Liga Expansión MX Cl. (Segunda División)</option>
+        <option value="MEXB" data-country="México">Liga Expansión MX Ap. (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Nicaragua">
+        <option value="NC1A" data-country="Nicaragua">Liga Primera Apertura (Primera División)</option>
+    </optgroup>
+    <optgroup label="Noruega">
+        <option value="NO1" data-country="Noruega">Eliteserien (Primera División)</option>
+        <option value="NO2" data-country="Noruega">OBOS-ligaen (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Panamá">
+        <option value="PN1A" data-country="Panamá">Liga Panameña Apertura (Primera División)</option>
+        <option value="PN1C" data-country="Panamá">Liga Panameña Clausura (Primera División)</option>
+    </optgroup>
+    <optgroup label="Paraguay">
+        <option value="PR1A" data-country="Paraguay">Primera División Apertura (Primera División)</option>
+        <option value="PR1C" data-country="Paraguay">Primera División Clausura (Primera División)</option>
+        <option value="PAR2" data-country="Paraguay">División Intermedia (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Países Bajos">
+        <option value="NL1" data-country="Países Bajos">Eredivisie (Primera División)</option>
+        <option value="NL2" data-country="Países Bajos">Keuken Kampioen Divisie (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Perú">
+        <option value="TDeA" data-country="Perú">Liga 1 Apertura (Primera División)</option>
+        <option value="TDeC" data-country="Perú">Liga 1 Clausura (Primera División)</option>
+        <option value="PER2" data-country="Perú">Liga 2 (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Polonia">
+        <option value="PL1" data-country="Polonia">Ekstraklasa (Primera División)</option>
+        <option value="PL2" data-country="Polonia">Betclic 1 Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Portugal">
+        <option value="PO1" data-country="Portugal">Liga Portugal (Primera División)</option>
+        <option value="PO2" data-country="Portugal">Liga Portugal 2 (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Puerto Rico">
+        <option value="PRA1" data-country="Puerto Rico">Liga Puerto Rico Apertura (Primera División)</option>
+    </optgroup>
+    <optgroup label="República Checa">
+        <option value="TS1" data-country="República Checa">Chance Liga (Primera División)</option>
+        <option value="TS2" data-country="República Checa">ChNL (Segunda División)</option>
+    </optgroup>
+    <optgroup label="República Dominicana">
+        <option value="DO1P" data-country="República Dominicana">Liga Dominicana - Liguilla (Primera División)</option>
+        <option value="DOM1" data-country="República Dominicana">Liga Dominicana de Fútbol (Primera División)</option>
+        <option value="DOMP" data-country="República Dominicana">Liga Dominicana - Playoff (Primera División)</option>
+    </optgroup>
+    <optgroup label="Rumania">
+        <option value="RO1" data-country="Rumania">SuperLiga (Primera División)</option>
+        <option value="RO2" data-country="Rumania">Liga 2 (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Rusia">
+        <option value="RU1" data-country="Rusia">Premier Liga (Primera División)</option>
+        <option value="RU2" data-country="Rusia">1.Division (Segunda División)</option>
+    </optgroup>
+    <optgroup label="San Marino">
+        <option value="SMR1" data-country="San Marino">Camp. Sammarinese (Primera División)</option>
+    </optgroup>
+    <optgroup label="Serbia">
+        <option value="SER1" data-country="Serbia">Super liga Srbije (Primera División)</option>
+        <option value="SER2" data-country="Serbia">Prva liga Srbije (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Suecia">
+        <option value="SE1" data-country="Suecia">Allsvenskan (Primera División)</option>
+        <option value="SE2" data-country="Suecia">Superettan (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Suiza">
+        <option value="C1" data-country="Suiza">Super League (Primera División)</option>
+        <option value="C2" data-country="Suiza">Challenge League (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Turquía">
+        <option value="TR1" data-country="Turquía">Süper Lig (Primera División)</option>
+        <option value="TR2" data-country="Turquía">1.Lig (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Ucrania">
+        <option value="UKR1" data-country="Ucrania">Premier de Ucrania (Primera División)</option>
+        <option value="UKR2" data-country="Ucrania">Persha Liga (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Uruguay">
+        <option value="URU1" data-country="Uruguay">Liga AUF Apertura (Primera División)</option>
+        <option value="URUI" data-country="Uruguay">Liga AUF Intermedio (Primera División)</option>
+        <option value="UR2T" data-country="Uruguay">Torneo Competencia (Segunda División)</option>
+        <option value="URU2" data-country="Uruguay">Segunda División (Segunda División)</option>
+    </optgroup>
+    <optgroup label="Venezuela">
+        <option value="VZ1A" data-country="Venezuela">Liga FUTVE Apertura (Primera División)</option>
+        <option value="VN2A" data-country="Venezuela">Liga FUTVE 2 (Segunda División)</option>
+    </optgroup>
+</select>
                 </div>
                 <div class="control-box">
                     <label for="season-select" data-i18n="seasonLabel">Season</label>
