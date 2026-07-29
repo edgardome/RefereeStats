@@ -1,19 +1,44 @@
 // Fetch Interceptor for JWT
 const originalFetch = window.fetch;
+
+// Global function so it's accessible from the fetch interceptor
+function showPremiumModal() {
+    const premiumModal = document.getElementById('premium-modal');
+    if (!premiumModal) return;
+    const token = sessionStorage.getItem('jwt_token');
+    if (token) {
+        // User is logged in but not premium -> hide signup form and login redirect
+        const divider = premiumModal.querySelector('.divider');
+        if (divider) divider.style.display = 'none';
+        const loginBtn = document.getElementById('btn-login-redirect');
+        if (loginBtn) loginBtn.style.display = 'none';
+        document.getElementById('fast-signup-form').style.display = 'none';
+        document.getElementById('btn-subscribe').style.display = 'block';
+    } else {
+        // Not logged in -> show everything
+        const divider = premiumModal.querySelector('.divider');
+        if (divider) divider.style.display = 'flex';
+        const loginBtn = document.getElementById('btn-login-redirect');
+        if (loginBtn) loginBtn.style.display = 'block';
+        document.getElementById('btn-subscribe').style.display = 'block';
+        document.getElementById('fast-signup-form').style.display = 'none';
+    }
+    premiumModal.classList.remove('hidden');
+}
+
 window.fetch = async (resource, config) => {
     let url = resource;
     if (resource instanceof Request) {
         url = resource.url;
     }
 
-    const isAuthRequest = url.includes('/api/auth/login') || url.includes('/api/auth/register') || url.includes('/api/payments/');
-    if (!isAuthRequest) {
-        const token = sessionStorage.getItem('jwt_token');
-        if (token) {
-            config = config || {};
-            config.headers = config.headers || {};
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
+    // Always attach token if available (payment endpoints need it too for checkout)
+    const token = sessionStorage.getItem('jwt_token');
+    const isLoginOrRegister = url.includes('/api/auth/login') || url.includes('/api/auth/register') || url.includes('/api/v1/auth/login') || url.includes('/api/v1/auth/register');
+    if (!isLoginOrRegister && token) {
+        config = config || {};
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${token}`;
     }
 
     const response = await originalFetch(resource, config);
@@ -22,23 +47,12 @@ window.fetch = async (resource, config) => {
             sessionStorage.removeItem('jwt_token');
             window.location.reload();
         } else {
-            // Already logged out, just show the auth modal or premium modal
-            if (typeof showPremiumModal === 'function') {
-                showPremiumModal();
-            } else {
-                const premiumModal = document.getElementById('premium-modal');
-                if (premiumModal) premiumModal.classList.remove('hidden');
-            }
+            showPremiumModal();
         }
         return Promise.reject('Unauthorized - Token Expired or Missing');
     }
     if (response.status === 403 || response.status === 402) {
-        if (typeof showPremiumModal === 'function') {
-            showPremiumModal();
-        } else {
-            const modal = document.getElementById('premium-modal');
-            if (modal) modal.classList.remove('hidden');
-        }
+        showPremiumModal();
         return Promise.reject('Unauthorized - Premium Required');
     }
     return response;
@@ -561,32 +575,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Premium Modal Logic
     const premiumModal = document.getElementById('premium-modal');
-    function showPremiumModal() {
-        if (premiumModal) {
-            const token = localStorage.getItem('jwtToken');
-            if (token) {
-                // If logged in, hide "OR" and "Login / PRO"
-                const divider = premiumModal.querySelector('.divider');
-                if (divider) divider.style.display = 'none';
-                const loginBtn = document.getElementById('btn-login-redirect');
-                if (loginBtn) loginBtn.style.display = 'none';
-                
-                // Ensure signup form is hidden and Subscribe button is visible
-                document.getElementById('fast-signup-form').style.display = 'none';
-                document.getElementById('btn-subscribe').style.display = 'block';
-                document.getElementById('btn-subscribe').textContent = t('subscribeBtn');
-            } else {
-                // Not logged in, show everything
-                const divider = premiumModal.querySelector('.divider');
-                if (divider) divider.style.display = 'flex';
-                const loginBtn = document.getElementById('btn-login-redirect');
-                if (loginBtn) loginBtn.style.display = 'block';
-                document.getElementById('btn-subscribe').style.display = 'block';
-                document.getElementById('fast-signup-form').style.display = 'none';
-            }
-            premiumModal.classList.remove('hidden');
-        }
-    }
+    // showPremiumModal is defined globally at top of file
     
     document.getElementById('btn-close-modal')?.addEventListener('click', () => {
         premiumModal.classList.add('hidden');
