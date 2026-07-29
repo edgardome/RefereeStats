@@ -16,8 +16,7 @@ public static class MatchCacheService
     public static string GetCacheFilePath(string league, string season)
     {
         var dataDirEnv = Environment.GetEnvironmentVariable("DATA_DIR");
-        var baseDir = !string.IsNullOrEmpty(dataDirEnv) ? dataDirEnv : Path.Combine(AppContext.BaseDirectory, "data");
-        var dir = Path.Combine(baseDir, "cache");
+        var dir = !string.IsNullOrEmpty(dataDirEnv) ? dataDirEnv : Path.Combine(AppContext.BaseDirectory, "data", "cache");
         Directory.CreateDirectory(dir);
         return Path.Combine(dir, $"{league}_{season}_matches.json");
     }
@@ -25,8 +24,7 @@ public static class MatchCacheService
     public static string GetRefereesCacheFilePath(string league, string season)
     {
         var dataDirEnv = Environment.GetEnvironmentVariable("DATA_DIR");
-        var baseDir = !string.IsNullOrEmpty(dataDirEnv) ? dataDirEnv : Path.Combine(AppContext.BaseDirectory, "data");
-        var dir = Path.Combine(baseDir, "cache");
+        var dir = !string.IsNullOrEmpty(dataDirEnv) ? dataDirEnv : Path.Combine(AppContext.BaseDirectory, "data", "cache");
         Directory.CreateDirectory(dir);
         return Path.Combine(dir, $"{league}_{season}_referees.json");
     }
