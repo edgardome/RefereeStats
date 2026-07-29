@@ -555,6 +555,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const premiumModal = document.getElementById('premium-modal');
     function showPremiumModal() {
         if (premiumModal) {
+            const token = localStorage.getItem('jwtToken');
+            if (token) {
+                // If logged in, hide "OR" and "Login / PRO"
+                const divider = premiumModal.querySelector('.divider');
+                if (divider) divider.style.display = 'none';
+                const loginBtn = document.getElementById('btn-login-redirect');
+                if (loginBtn) loginBtn.style.display = 'none';
+                
+                // Ensure signup form is hidden and Subscribe button is visible
+                document.getElementById('fast-signup-form').style.display = 'none';
+                document.getElementById('btn-subscribe').style.display = 'block';
+                document.getElementById('btn-subscribe').textContent = t('subscribeBtn');
+            } else {
+                // Not logged in, show everything
+                const divider = premiumModal.querySelector('.divider');
+                if (divider) divider.style.display = 'flex';
+                const loginBtn = document.getElementById('btn-login-redirect');
+                if (loginBtn) loginBtn.style.display = 'block';
+                document.getElementById('btn-subscribe').style.display = 'block';
+                document.getElementById('fast-signup-form').style.display = 'none';
+            }
             premiumModal.classList.remove('hidden');
         }
     }
@@ -572,9 +593,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/login.html';
     });
     
-    document.getElementById('btn-subscribe')?.addEventListener('click', () => {
-        document.getElementById('btn-subscribe').style.display = 'none';
-        document.getElementById('fast-signup-form').style.display = 'block';
+    document.getElementById('btn-subscribe')?.addEventListener('click', async () => {
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+            // Already logged in! Extract email and proceed to checkout
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                const payload = JSON.parse(jsonPayload);
+                
+                const email = payload.email || payload.sub || payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
+                
+                const btn = document.getElementById('btn-subscribe');
+                const origText = btn.textContent;
+                btn.textContent = "Redirecting...";
+                btn.disabled = true;
+
+                const res = await fetch('/api/v1/payments/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await res.json();
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    btn.textContent = origText;
+                    btn.disabled = false;
+                    showToast('Checkout failed', 3000);
+                }
+            } catch (e) {
+                console.error("Failed to parse JWT or checkout", e);
+                showToast('An error occurred', 3000);
+            }
+        } else {
+            // Not logged in, show signup form
+            document.getElementById('btn-subscribe').style.display = 'none';
+            document.getElementById('fast-signup-form').style.display = 'block';
+        }
     });
     
     document.getElementById('btn-submit-signup')?.addEventListener('click', async () => {
