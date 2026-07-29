@@ -122,6 +122,7 @@ public sealed class PaymentController : ControllerBase
     }
 
     [HttpPost("webhook")]
+    [AllowAnonymous]
     public async Task<IActionResult> Webhook()
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
