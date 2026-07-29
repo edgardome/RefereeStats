@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace RefereeStats.WebApi.Filters;
 
@@ -29,9 +30,12 @@ public class FreemiumLeagueFilterAttribute : ActionFilterAttribute
 
         if (!isFreeRequest)
         {
+            var logger = context.HttpContext.RequestServices.GetService(typeof(ILogger<FreemiumLeagueFilterAttribute>)) as ILogger<FreemiumLeagueFilterAttribute>;
+            
             // If it's not a free request, check authentication AND premium status
             if (context.HttpContext.User.Identity?.IsAuthenticated != true)
             {
+                logger?.LogWarning("Freemium filter: Request not authenticated.");
                 context.Result = new UnauthorizedObjectResult(new { error = "Premium access requires authentication. Please log in or provide a valid API Key." });
                 return;
             }
@@ -41,6 +45,7 @@ public class FreemiumLeagueFilterAttribute : ActionFilterAttribute
 
             if (string.IsNullOrEmpty(email))
             {
+                logger?.LogWarning("Freemium filter: No email claim found in token.");
                 context.Result = new UnauthorizedObjectResult(new { error = "Invalid token claims." });
                 return;
             }
@@ -48,12 +53,16 @@ public class FreemiumLeagueFilterAttribute : ActionFilterAttribute
             var authService = context.HttpContext.RequestServices.GetService(typeof(RefereeStats.WebApi.Services.AuthService)) as RefereeStats.WebApi.Services.AuthService;
             var user = authService?.GetUserByEmail(email);
 
+            logger?.LogInformation("Freemium filter checking premium for {Email}: IsPremiumDb = {IsPremium}", email, user?.IsPremium);
+
             if (user?.IsPremium != true)
             {
+                logger?.LogWarning("Freemium filter: Access denied. Premium required for {Email}.", email);
                 // We use 403 Forbidden to indicate they are authenticated but lack premium rights
                 context.Result = new ObjectResult(new { error = "Premium subscription required." }) { StatusCode = 403 };
                 return;
             }
+            logger?.LogInformation("Freemium filter: Access granted to {Email}.", email);
         }
         
         base.OnActionExecuting(context);
