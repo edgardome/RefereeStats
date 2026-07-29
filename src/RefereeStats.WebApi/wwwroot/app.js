@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     document.getElementById('btn-subscribe')?.addEventListener('click', async () => {
-        const token = localStorage.getItem('jwtToken');
+        const token = sessionStorage.getItem('jwt_token');
         if (token) {
             // Already logged in! Extract email and proceed to checkout
             try {
