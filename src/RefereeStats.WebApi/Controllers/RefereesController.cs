@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using System.IO.Compression;
 using RefereeStats.WebApi.Services;
 
 namespace RefereeStats.WebApi.Controllers;
@@ -238,5 +239,49 @@ public sealed class RefereesController(RefereeScraper scraper, IConfiguration co
         }
 
         return Ok(results);
+    }
+
+    [HttpPost("leagues/upload-cache")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UploadCache(IFormFile? file, CancellationToken ct)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest(new { error = "No file provided." });
+
+        if (!file.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            return BadRequest(new { error = "Only .zip files are allowed." });
+
+        var dataDirEnv = Environment.GetEnvironmentVariable("DATA_DIR");
+        var dir = !string.IsNullOrEmpty(dataDirEnv) ? dataDirEnv : Path.Combine(AppContext.BaseDirectory, "data", "cache");
+        Directory.CreateDirectory(dir);
+
+        var tempPath = Path.GetTempFileName();
+        try
+        {
+            using (var stream = new FileStream(tempPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream, ct);
+            }
+
+            // Extract the ZIP contents into the cache directory.
+            // We use Overwrite = true to replace older cached items with the uploaded ones.
+            ZipFile.ExtractToDirectory(tempPath, dir, overwriteFiles: true);
+
+            var extractedFiles = Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories).Length;
+            return Ok(new { message = "Cache uploaded successfully.", totalJsonFilesInCache = extractedFiles });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = "Failed to extract ZIP.", details = ex.Message });
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempPath))
+            {
+                try { System.IO.File.Delete(tempPath); } catch { /* Ignore */ }
+            }
+        }
     }
 }
