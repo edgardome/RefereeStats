@@ -1,6 +1,13 @@
-# Referee Stats Scraper
+# Transfermarkt Referee Stats Scraper & REST API ⚽🟨
 
-Football referee statistics scraper (source: Transfermarkt), .NET 8, packaged as:
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![C#](https://img.shields.io/badge/C%23-239120?logo=c-sharp&logoColor=white)](https://docs.microsoft.com/dotnet/csharp/)
+[![Transfermarkt](https://img.shields.io/badge/Data_Source-Transfermarkt-002D62)](https://www.transfermarkt.com/)
+[![xUnit](https://img.shields.io/badge/Tests-xUnit-512BD4)](https://xunit.net/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Apify](https://img.shields.io/badge/Apify-Actor-00A651?logo=apify&logoColor=white)](https://apify.com/)
+
+Professional **Transfermarkt** football referee statistics scraper and analytics REST API built with **.NET 8**, packaged as:
 
 1. **Apify Actor** — Docker container that reads JSON input and writes to Apify dataset.
 2. **REST API** (`RefereeStats.WebApi`) — same data via HTTP, intended for RapidAPI Hub.
@@ -10,11 +17,11 @@ Both hosts reuse `RefereeStats.Core` (scraping, parsing, export, models).
 ## Structure
 
 ```
-src/RefereeStats.Core/         Shared library: scraping, parsing, export, models
-src/RefereeStats.ApifyActor/   Host 1 — console app executed inside Apify Actor
-src/RefereeStats.WebApi/       Host 2 — REST API for RapidAPI
+src/RefereeStats.Core/ —  —  —  —  Shared library: scraping, parsing, export, models
+src/RefereeStats.ApifyActor/ —  Host 1 — console app executed inside Apify Actor
+src/RefereeStats.WebApi/ —  —  —  Host 2 — REST API for RapidAPI
 tests/RefereeStats.Core.Tests/ xUnit — parsing with local HTML fixtures, export tests
-.actor/                        Actor manifest, input schema, and Dockerfile
+.actor/ —  —  —  —  —  —  —  —  —  —  —  — Actor manifest, input schema, and Dockerfile
 ```
 
 ## Local Build
@@ -61,10 +68,10 @@ Rate limiting is handled via `AspNetCoreRateLimit` (independent of RapidAPI).
 ```bash
 docker build -f .actor/Dockerfile -t referee-stats-actor .
 docker run --rm \
-  -e APIFY_TOKEN=xxx \
-  -e APIFY_DEFAULT_KEY_VALUE_STORE_ID=xxx \
-  -e APIFY_DEFAULT_DATASET_ID=xxx \
-  referee-stats-actor
+ — -e APIFY_TOKEN=xxx \
+ — -e APIFY_DEFAULT_KEY_VALUE_STORE_ID=xxx \
+ — -e APIFY_DEFAULT_DATASET_ID=xxx \
+ — referee-stats-actor
 ```
 
 ## Deploy to Apify
@@ -121,10 +128,10 @@ The API is packaged with a `Dockerfile` and `railway.toml` for easy deploy on Ra
 1. Connect your repository to Railway.
 2. Add a persistent **Volume** and mount it under `/app/data/cache`.
 3. Set the environment variables:
-   - `ASPNETCORE_ENVIRONMENT`: `Production`
-   - `RapidApi:ProxySecret`: Your RapidAPI secret key (for proxy protection)
-   - `Jwt:Key`: A strong security key for generating dashboard session tokens.
-   - `DefaultAdminPassword`: Set a master password (defaults to `admin123_ChangeMe!`).
+ —  - `ASPNETCORE_ENVIRONMENT`: `Production`
+ —  - `RapidApi:ProxySecret`: Your RapidAPI secret key (for proxy protection)
+ —  - `Jwt:Key`: A strong security key for generating dashboard session tokens.
+ —  - `DefaultAdminPassword`: Set a master password (defaults to `admin123_ChangeMe!`).
 
 ## Error Categorization
 
